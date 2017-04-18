@@ -1,0 +1,4 @@
+digraph G [shape=box] {
+    {ModBehavior, TextInput} -> Element;
+    Element -> {Scene, Action, Character, Dialogue};
+}
