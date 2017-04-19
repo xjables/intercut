@@ -94,14 +94,10 @@ class Scene(Element):
         if self.unaltered_text:
             if modifier == 'ctrl':
                 # Slice off trailing word
+                # TODO: Below is hackey. Do it properly.
                 self.unaltered_text = self.unaltered_text[::-1].split(' ', 1)[1][::-1] + ' '
             else:
                 self.unaltered_text = self.unaltered_text[:-1]
-
-        print(self.unaltered_text)
-
-
-        print(self.unaltered_text)
 
 
 class Character(Element):

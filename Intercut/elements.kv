@@ -9,11 +9,16 @@
 
 <Action>:
     hint_text: '[Action]'
-    on_text_validate: self.parent.add_action()
+    on_text_validate: self.parent.add_action(self.element_index)
 
 <Scene>:
     hint_text: '[SCENE]'
-    on_text_validate: self.parent.add_action()
+    on_text_validate: self.parent.add_action(self.element_index)
 
 <Character>:
     hint_text: '[Character]'
+    on_text_validate: self.parent.add_dialogue(self.element_index)
+
+<Dialogue>:
+    hint_text: '[Dialogue]'
+    on_text_validate: self.parent.add_character(self.element_index)

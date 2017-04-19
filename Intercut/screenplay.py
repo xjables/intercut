@@ -1,39 +1,43 @@
-from kivy.uix.boxlayout import BoxLayout
+"""Defines the Screenplay container for holding elements.
 
+A Screenplay is just a BoxLayout for carrying the actual Element widgets.
+
+"""
+
+from kivy.uix.boxlayout import BoxLayout
 from kivy.lang import Builder
 
-from elements import Action, Scene, Character
+from elements import Action, Scene, Character, Dialogue
 
 Builder.load_file(r'screenplay.kv')
 
 class Screenplay(BoxLayout):
 
-    # TODO: write an Widget.add_widget wrapper that calls add_widget, the
-    # correctly sets their element_index property.
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.elements = []
 
-    def add_action(self):
-        # TODO: Currently,
+    def add_action(self, index=0):
         # For some reason the focus functionality hangs when written as:
         # self.add_widget(Action(focus=True))
         action = Action()
         action.focus = True
-        self.add_widget(action)
+        self.add_widget(action, index=index)
 
-    def add_scene(self):
+    def add_scene(self, index=0):
         scene = Scene()
         scene.focus = True
-        self.add_widget(scene)
+        self.add_widget(scene, index=index)
 
     def add_character(self, index=0):
         """Add Character element to screenplay.
 
         Args:
+            index (int, optional): Default to 0.
         """
-        self.add_widget(Character(focus=True))
+        character = Character()
+        character.focus = True
+        self.add_widget(character, index=index)
 
     def add_widget(self, widget, **kwargs):
         """Wrapper for Widget.add_widget() that updates element indicies after
