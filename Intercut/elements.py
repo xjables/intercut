@@ -22,7 +22,7 @@ from kivy.properties import NumericProperty
 
 from kivy.lang import Builder
 
-from mod import ModBehavior
+from elementbehavior import ModBehavior
 
 Builder.load_file(r'elements.kv')
 
