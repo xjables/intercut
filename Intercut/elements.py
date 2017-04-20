@@ -38,6 +38,8 @@ class Element(ModBehavior, TextInput):
         # Every object can be referenced by a lowercase version of its name
         super().__init__(**kwargs)
 
+    def soft_wrap(self):
+        pass
 
 class Action(Element):
 

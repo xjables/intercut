@@ -29,9 +29,9 @@ class ModBehavior(object):
                 '127': self.delete_word_right,  # ctrl + del
             },
             'alt': {
-                '97': self.transform,  # alt + 'a'
             },
         }
+
 
     # Keyboard Shortcut callbacks defined below
     def keyboard_on_key_down(self, window, keycode, text, modifiers):

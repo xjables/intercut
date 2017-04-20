@@ -4,14 +4,15 @@ A Screenplay is just a BoxLayout for carrying the actual Element widgets.
 
 """
 
-from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
+from colorpad import ColoredBoxLayout
 from kivy.lang import Builder
 
 from elements import Action, Scene, Character, Dialogue
 
 Builder.load_file(r'screenplay.kv')
 
-class Screenplay(BoxLayout):
+class Screenplay(GridLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -25,10 +26,12 @@ class Screenplay(BoxLayout):
             source_element: The element requesting that an element be added.
             added_element: The element object to be inserted.
         """
+        print('add_element')
         element = added_element()
         element.focus = True
         # Adding the widget at source_element's location adds it in place
         self.add_widget(element, index=source_element.element_index)
+        self.parent.scroll_to(element)
 
     def add_widget(self, widget, **kwargs):
         """Wrapper for Widget.add_widget() that updates element indicies after
