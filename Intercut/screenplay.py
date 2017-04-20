@@ -15,29 +15,20 @@ class Screenplay(BoxLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.elements = []
 
-    def add_action(self, index=0):
-        # For some reason the focus functionality hangs when written as:
-        # self.add_widget(Action(focus=True))
-        action = Action()
-        action.focus = True
-        self.add_widget(action, index=index)
+    def add_element(self, source_element, added_element=Action):
+        """Add an element to screenplay.
 
-    def add_scene(self, index=0):
-        scene = Scene()
-        scene.focus = True
-        self.add_widget(scene, index=index)
-
-    def add_character(self, index=0):
-        """Add Character element to screenplay.
+        Note: added_element is a class, not an instance of the class.
 
         Args:
-            index (int, optional): Default to 0.
+            source_element: The element requesting that an element be added.
+            added_element: The element object to be inserted.
         """
-        character = Character()
-        character.focus = True
-        self.add_widget(character, index=index)
+        element = added_element()
+        element.focus = True
+        # Adding the widget at source_element's location adds it in place
+        self.add_widget(element, index=source_element.element_index)
 
     def add_widget(self, widget, **kwargs):
         """Wrapper for Widget.add_widget() that updates element indicies after

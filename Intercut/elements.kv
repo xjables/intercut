@@ -1,4 +1,4 @@
-
+#:import elements elements
 
 <Element>:
     background_color: [1, 1, 1, 0]
@@ -9,16 +9,16 @@
 
 <Action>:
     hint_text: '[Action]'
-    on_text_validate: self.parent.add_action(self.element_index)
+    on_text_validate: self.parent.add_element(self, added_element=elements.Action)
 
 <Scene>:
     hint_text: '[SCENE]'
-    on_text_validate: self.parent.add_action(self.element_index)
+    on_text_validate: self.parent.add_element(self, added_element=elements.Action)
 
 <Character>:
     hint_text: '[Character]'
-    on_text_validate: self.parent.add_dialogue(self.element_index)
+    on_text_validate: self.parent.add_element(self, added_element=elements.Dialogue)
 
 <Dialogue>:
     hint_text: '[Dialogue]'
-    on_text_validate: self.parent.add_character(self.element_index)
+    on_text_validate: self.parent.add_element(self, added_element=element.Character)
