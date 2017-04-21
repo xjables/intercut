@@ -22,12 +22,12 @@ from kivy.properties import NumericProperty
 
 from kivy.lang import Builder
 
-from elementbehavior import ModBehavior
+from elementbehavior import ElementBehavior
 
 Builder.load_file(r'elements.kv')
 
 
-class Element(ModBehavior, TextInput):
+class Element(ElementBehavior, TextInput):
 
     """A base class for all of the individual elements."""
 
@@ -35,8 +35,9 @@ class Element(ModBehavior, TextInput):
     element_index = NumericProperty()
 
     def __init__(self, **kwargs):
-        # Every object can be referenced by a lowercase version of its name
         super().__init__(**kwargs)
+        self.register_shortcut(8, modifier='ctrl', callback=self.delete_word_left) # 'ctrl' + backspace
+        self.register_shortcut(127, modifier='ctrl', callback=self.delete_word_right) # 'ctrl' + delete
 
     def soft_wrap(self):
         pass
