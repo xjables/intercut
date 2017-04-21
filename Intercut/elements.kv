@@ -1,24 +1,28 @@
-
+#:import elements elements
 
 <Element>:
+    size_hint_y: None
+    text_size: self.width, None
+    font_size: 25
     background_color: [1, 1, 1, 0]
     font_name: r'courier.ttf'
     font_size: 24
     cursor_color: [0, 0, 0, 1]
     multiline: False
+    on_text: self.soft_wrap()
 
 <Action>:
     hint_text: '[Action]'
-    on_text_validate: self.parent.add_action(self.element_index)
+    on_text_validate: self.parent.add_element(self, added_element=elements.Action)
 
 <Scene>:
     hint_text: '[SCENE]'
-    on_text_validate: self.parent.add_action(self.element_index)
+    on_text_validate: self.parent.add_element(self, added_element=elements.Action)
 
 <Character>:
     hint_text: '[Character]'
-    on_text_validate: self.parent.add_dialogue(self.element_index)
+    on_text_validate: self.parent.add_element(self, added_element=elements.Dialogue)
 
 <Dialogue>:
     hint_text: '[Dialogue]'
-    on_text_validate: self.parent.add_character(self.element_index)
+    on_text_validate: self.parent.add_element(self, added_element=elements.Character)
