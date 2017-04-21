@@ -10,10 +10,10 @@ Allows for a default text feature.
 from kivy.properties import StringProperty, NumericProperty
 
 
-__all__ = ('ModBehavior', )
+__all__ = ('ElementBehavior', )
 
 
-class ModBehavior(object):
+class ElementBehavior(object):
 
     """For modifying the behavior of TextInput"""
 
@@ -21,16 +21,43 @@ class ModBehavior(object):
 
 
     def __init__(self, **kwargs):
-        super(ModBehavior, self).__init__(**kwargs)
+        super(ElementBehavior, self).__init__(**kwargs)
 
         self.bindings = {
-            'ctrl': {
-                '8': self.delete_word_left,   # ctrl + backspace
-                '127': self.delete_word_right,  # ctrl + del
-            },
-            'alt': {
-            },
+            # Registered shortcuts will take the form str(keycode): callback
+            # inside one of the following sub dictionaries
+            'ctrl': {},
+            'alt': {},
+            '': {},
         }
+
+    def register_shortcut(self, keycode, callback, modifier=None, pass_signal=False):
+        """Register a text input shortcut.
+
+        Use register_shortcut in the class __init__.
+
+        Note: If you register a shortcut in parent class and you want a child
+            to overwrite it, make sure to reregister the shortcut in the child
+            class __init__ AFTER you have called the parent initializer. To
+            remove the parent class registration, use the revoke_shortcut
+            method.
+
+        Args:
+            keycode (int): The ascii key code for the key to be captured.
+            modifier (string): 'ctrl' or 'alt' or None.
+            callback (function object): The function to run on key shortcut capture.
+            pass_signal (bool): Bool indicating whether or not the key code
+                should also be passed on to the TextInput widget to add its
+                default behavior.
+        """
+        modifier = modifier if modifier else ''
+        try:
+            self.bindings[modifier][str(keycode)] = callback
+        except KeyError as err:
+            print("KeyError:", err)
+
+    def print_bindings(self):
+        print(self.bindings)
 
 
     # Keyboard Shortcut callbacks defined below
@@ -38,15 +65,8 @@ class ModBehavior(object):
         # TODO: rewrite this to allow for callbacks with arguments
         key, key_str = keycode
         # Get modified or None
-        mod = modifiers[0] if modifiers else None
+        mod = modifiers[0]
         is_mods_shortcut = False
-
-        if key == 8 and self.element_index == 'scene':
-            if mod == 'ctrl':
-                self.on_backspace(modifier=mod)
-            else:
-                self.on_backspace()
-
 
         if mod and key in range(256):
             is_mods_shortcut = ((mod == 'ctrl' and
@@ -60,7 +80,7 @@ class ModBehavior(object):
         else:
             # If no shortcut matche, pass control on to standard TextInput
             # to try to match shortcuts.
-            super(ModBehavior, self).keyboard_on_key_down(window, keycode,
+            super(ElementBehavior, self).keyboard_on_key_down(window, keycode,
                                                             text, modifiers)
 
     def set_focus_index(self):
