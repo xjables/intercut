@@ -28,10 +28,9 @@ class ElementBehavior(object):
             # inside one of the following sub dictionaries
             'ctrl': {},
             'alt': {},
-            '': {},
         }
 
-    def register_shortcut(self, keycode, callback, modifier=None):
+    def register_shortcut(self, keycode, callback, modifier):
         """Register a text input shortcut.
 
         Use register_shortcut in the class __init__.
@@ -50,13 +49,12 @@ class ElementBehavior(object):
                 should also be passed on to the TextInput widget to add its
                 default behavior.
         """
-        modifier = modifier if modifier else ''
         try:
             self.bindings[modifier][str(keycode)] = callback
         except KeyError as err:
-            print("KeyError:", err)
+            raise err
 
-    def revoke_shortcut(self, keycode, modifier=''):
+    def revoke_shortcut(self, keycode, modifier):
         """Remove shortcut from bindings.
 
         Args:
@@ -75,12 +73,12 @@ class ElementBehavior(object):
         # This function is called on key_down event. This is where control is
         # passed to the behavior.
         key, key_str = keycode
-        mod = modifiers[0] if modifiers else ''
+        mod = modifiers[0] if modifiers else None
         is_element_shortcut = False
 
         # Once this is proven to work, you can remove the latter condition to
         # extend its use to all unicode character shortcuts
-        if mod in ('alt', 'ctrl', '') and key in range(256):
+        if mod in ('alt', 'ctrl') and key in range(256):
             is_element_shortcut = str(key) in self.bindings[mod]
 
         if is_element_shortcut:

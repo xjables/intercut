@@ -26,7 +26,6 @@ class Screenplay(GridLayout):
             source_element: The element requesting that an element be added.
             added_element: The element object to be inserted.
         """
-        print('add_element')
         element = added_element()
         element.focus = True
         # Adding the widget at source_element's location adds it in place

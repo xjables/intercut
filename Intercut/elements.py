@@ -24,6 +24,8 @@ from kivy.lang import Builder
 
 from elementbehavior import ElementBehavior
 
+import textwrap
+
 Builder.load_file(r'elements.kv')
 
 
@@ -33,14 +35,25 @@ class Element(ElementBehavior, TextInput):
 
     # This will be used to track the elements location in the SP directly.
     element_index = NumericProperty()
+    # TextInput.text is the displayed text. It will have formatting in it such
+    # as capitalizations and wrapping newline characters. This text will remain
+    # unformatted in the background.
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.register_shortcut(8, modifier='ctrl', callback=self.delete_word_left) # 'ctrl' + backspace
         self.register_shortcut(127, modifier='ctrl', callback=self.delete_word_right) # 'ctrl' + delete
 
-    def soft_wrap(self):
-        pass
+    def insert_text(self, substring, from_undo=False):
+        # TODO: Clip spaces at the beginning of lines post wrap.
+        # TODO: Dynamically resize TextInput so it does not clip any of the
+        #       inputted text from view. SEE: texture_size...
+        unwrapped = self.text.replace('\n', '')
+        to_wrap = unwrapped + substring
+        wrapped_text = textwrap.fill(to_wrap, width=30, drop_whitespace=False)
+        self.text = ''
+        super().insert_text(wrapped_text, from_undo=from_undo)
+
 
 class Action(Element):
 
