@@ -26,6 +26,7 @@ from elementbehavior import ElementBehavior
 
 import textwrap
 
+
 Builder.load_file(r'elements.kv')
 
 
@@ -41,8 +42,10 @@ class Element(ElementBehavior, TextInput):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.register_shortcut(8, modifier='ctrl', callback=self.delete_word_left) # 'ctrl' + backspace
-        self.register_shortcut(127, modifier='ctrl', callback=self.delete_word_right) # 'ctrl' + delete
+        self.register_shortcut(  # 'ctrl' + backspace
+            8, modifier='ctrl', callback=self.delete_word_left) 
+        self.register_shortcut(  # 'ctrl' + delete
+            127, modifier='ctrl', callback=self.delete_word_right)
 
     def insert_text(self, substring, from_undo=False):
         # TODO: Clip spaces at the beginning of lines post wrap.
@@ -79,7 +82,7 @@ class Scene(Element):
         if self.unaltered_text:
             if modifier == 'ctrl':
                 # Slice off trailing word
-                # TODO: Below is hackey. Do it properly.
+                # FIXME: Below is hackey. Do it properly.
                 self.unaltered_text = self.unaltered_text[::-1].split(' ', 1)[1][::-1] + ' '
             else:
                 self.unaltered_text = self.unaltered_text[:-1]
@@ -95,3 +98,6 @@ class Dialogue(Element):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+
+
