@@ -16,15 +16,18 @@ Parenthetical:
     This is embedded in dialogue to indicate a non-verbal cue to the actors.
 """
 
+import textwrap
+
 from kivy.uix.textinput import TextInput
 from kivy.properties import StringProperty
 from kivy.properties import NumericProperty
-
 from kivy.lang import Builder
 
 from elementbehavior import ElementBehavior
+from tools import stringmanip
 
-import textwrap
+
+
 
 
 Builder.load_file(r'elements.kv')
@@ -82,8 +85,9 @@ class Scene(Element):
         if self.unaltered_text:
             if modifier == 'ctrl':
                 # Slice off trailing word
-                # FIXME: Below is hackey. Do it properly.
-                self.unaltered_text = self.unaltered_text[::-1].split(' ', 1)[1][::-1] + ' '
+                self.unaltered_text = stringmanip.remove_last_word(
+                    self.unaltered_text
+                    )
             else:
                 self.unaltered_text = self.unaltered_text[:-1]
 
