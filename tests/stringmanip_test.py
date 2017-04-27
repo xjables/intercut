@@ -8,8 +8,8 @@ def test_cut_basic_string():
 
 
 def test_cut_empty_string():
-    with pytest.raises(ValueError):
-        stringmanip.remove_last_word("")
+    with pytest.raises(TypeError):
+        stringmanip.remove_last_word(15)
 
 
 def test_cut_no_spaces():

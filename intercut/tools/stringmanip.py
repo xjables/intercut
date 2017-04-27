@@ -9,5 +9,8 @@ def remove_last_word(string):
     Args:
         string (str): A string.
     """
-    # TODO: Below is hackey. Do it properly.
-    return string[::-1].split(' ', 1)[1][::-1] + ' '
+    if " " not in string:
+        return ""
+    else:
+        partition = string.rpartition(" ")
+        return partition[0] + " "
