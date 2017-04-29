@@ -71,25 +71,19 @@ class Scene(Element):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.unaltered_text = ''
+        self.unformatted = stringmanip.UnformattedText()
 
     def insert_text(self, substring, from_undo=False):
-        '''Capitalize scene heading.'''
-        self.unaltered_text += substring
-        print(self.unaltered_text)
+        """Capitalize scene heading."""
+        self.unformatted.text += substring
+        print(self.unformatted.text)
         insert = substring.upper()
         super().insert_text(insert, from_undo)
 
     def on_backspace(self, modifier=None):
-        """Track unaltered text on backspace"""
-        if self.unaltered_text:
-            if modifier == 'ctrl':
-                # Slice off trailing word
-                self.unaltered_text = stringmanip.remove_last_word(
-                    self.unaltered_text
-                    )
-            else:
-                self.unaltered_text = self.unaltered_text[:-1]
+        """Track unaltered text on backspace."""
+        self.unformatted.resolve_deletion()
+        print(self.unformatted.text)
 
 
 class Character(Element):

@@ -14,3 +14,5 @@ def test_cut_empty_string():
 
 def test_cut_no_spaces():
     assert "" == stringmanip.remove_last_word("NoSpacesInString")
+
+
