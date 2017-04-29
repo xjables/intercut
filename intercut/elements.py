@@ -72,6 +72,9 @@ class Scene(Element):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.unformatted = stringmanip.UnformattedText()
+        self.register_shortcut(
+            8, callback=self.on_backspace
+        )
 
     def insert_text(self, substring, from_undo=False):
         """Capitalize scene heading."""
@@ -80,9 +83,9 @@ class Scene(Element):
         insert = substring.upper()
         super().insert_text(insert, from_undo)
 
-    def on_backspace(self, modifier=None):
+    def on_backspace(self):
         """Track unaltered text on backspace."""
-        self.unformatted.resolve_deletion()
+        self.unformatted.resolve_deletion(self.text)
         print(self.unformatted.text)
 
 

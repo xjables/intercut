@@ -29,7 +29,11 @@ class ElementBehavior(object):
             'alt': {},
         }
 
-    def register_shortcut(self, keycode, callback, modifier):
+        # Register special keys by setting modifier to None in
+        # register_shortcut
+        self.special_keys = {}
+
+    def register_shortcut(self, keycode, callback, modifier=None):
         """Register a text input shortcut.
 
         Use register_shortcut in the class __init__.
@@ -42,16 +46,23 @@ class ElementBehavior(object):
 
         Args:
             keycode (int): The ascii key code for the key to be captured.
-            modifier (string): 'ctrl' or 'alt' or None.
-            callback (function object): The function to run on key shortcut capture.
-            pass_signal (bool): Bool indicating whether or not the key code
-                should also be passed on to the TextInput widget to add its
-                default behavior.
+            modifier (string): 'ctrl' or 'alt' or None. If the modifier is
+                None, the shortcut is tied to a particular key press without
+                modifiers.
+            callback (function object): The function to run on key shortcut
+                capture.
         """
-        try:
-            self.bindings[modifier][str(keycode)] = callback
-        except KeyError as err:
-            raise err
+        if modifier:
+            try:
+                self.bindings[modifier][str(keycode)] = callback
+            except KeyError as err:
+                raise err
+
+        else:
+            try:
+                self.special_keys[str(keycode)] = callback
+            except KeyError as err:
+                raise err
 
     def revoke_shortcut(self, keycode, modifier):
         """Remove shortcut from bindings.
@@ -60,25 +71,34 @@ class ElementBehavior(object):
             keycode (int): The ascii key code for the key to be captured.
             modifier (string): 'ctrl' or 'alt' or None.
         """
-        try:
-            del self.bindings[modifier][str(keycode)]
-        except KeyError as err:
-            print("KeyError:", err)
+        if modifier:
+            try:
+                del self.bindings[modifier][str(keycode)]
+            except KeyError as err:
+                print("KeyError:", err)
+
+        else:
+            try:
+                del self.special_keys[str(keycode)]
+            except KeyError as err:
+                print("KeyError:", err)
 
     def print_bindings(self):
         print(self.bindings)
 
     def keyboard_on_key_down(self, window, keycode, text, modifiers):
+        # TODO: This function needs to be refactored.
         # This function is called on key_down event. This is where control is
         # passed to the behavior.
         key, key_str = keycode
-        mod = modifiers[0] if modifiers else None
-        is_element_shortcut = False
 
-        # Once this is proven to work, you can remove the latter condition to
-        # extend its use to all unicode character shortcuts
-        if mod in ('alt', 'ctrl') and key in range(256):
+        is_special_key = str(key) in self.special_keys
+
+        mod = modifiers[0] if modifiers else None
+        if mod in ('alt', 'ctrl'):
             is_element_shortcut = str(key) in self.bindings[mod]
+        else:
+            is_element_shortcut = False
 
         if is_element_shortcut:
             # Get callback from bindings and run it.
@@ -88,7 +108,11 @@ class ElementBehavior(object):
             # If no shortcut matches, pass control on to standard TextInput
             # to try to match shortcuts.
             super(ElementBehavior, self).keyboard_on_key_down(window, keycode,
-                                                              text, modifiers)
+                                                                  text, modifiers)
+
+        if is_special_key:
+            key_callback = self.special_keys[str(key)]
+            key_callback()
 
     def delete_word_right(self):
         """Delete text right of the cursor to the end of the word."""

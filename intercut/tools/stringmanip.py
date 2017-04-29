@@ -60,23 +60,28 @@ class UnformattedText:
         Returns:
 
         """
-        # Length of the word removed from the input
-        cut_len = len(self.text) - len(input_text)
+
+        input_len = len(input_text)
+        unform_len = len(self.text)
+        # cut_len is length of the word removed from the input
+        assert unform_len >= input_len
+
+        cut_len = unform_len - input_len
 
         # The text was not changed
         if cut_len == 0:
             return
 
-        # Special case where last character is removed only
-        if cut_len == 1 and self.text[:-1].upper() == input_text:
-            self.text = self.text[:-1]
+        # All text removed
+        if input_len == 0:
+            self.text = ''
+            return
 
-        # Internal string deletion (deletion within the string as a whole)
-        else:
-            for i, char in enumerate(self.text):
-                if char.upper() != input_text[i]:
-                    slice_to = i
-                    break
+        slice_to = input_len
+        for i in range(input_len):
+            if self.text[i].upper() != input_text[i]:
+                slice_to = i
+                break
 
-            self.text = self.text[:slice_to] \
-                        + self.text[(slice_to + cut_len):]
+        self.text = self.text[:slice_to] \
+                    + self.text[(slice_to + cut_len):]
