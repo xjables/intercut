@@ -16,6 +16,7 @@
 
 <Scene>:
     hint_text: '[SCENE]'
+    on_text: print("on_text called"); self.unformatted.resolve(self.text)
     on_text_validate: self.parent.add_element(self, added_element=elements.Action)
 
 <Character>:

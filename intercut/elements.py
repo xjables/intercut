@@ -50,15 +50,16 @@ class Element(ElementBehavior, TextInput):
         self.register_shortcut(  # 'ctrl' + delete
             127, modifier='ctrl', callback=self.delete_word_right)
 
-    def insert_text(self, substring, from_undo=False):
-        # TODO: Clip spaces at the beginning of lines post wrap.
-        # TODO: Dynamically resize TextInput so it does not clip any of the
-        #       inputted text from view. SEE: texture_size...
-        unwrapped = self.text.replace('\n', '')
-        to_wrap = unwrapped + substring
-        wrapped_text = textwrap.fill(to_wrap, width=30, drop_whitespace=False)
-        self.text = ''
-        super().insert_text(wrapped_text, from_undo=from_undo)
+    # def insert_text(self, substring, from_undo=False):
+    #     # TODO: Clip spaces at the beginning of lines post wrap.
+    #     # TODO: Dynamically resize TextInput so it does not clip any of the
+    #     #       inputted text from view. SEE: texture_size...
+    #     unwrapped = self.text.replace('\n', '')
+    #     to_wrap = unwrapped + substring
+    #     wrapped_text = textwrap.fill(to_wrap, width=30, drop_whitespace=False)
+        # The line below makes on_text be called. This is bad.
+    #     self.text = ''
+    #     super().insert_text(wrapped_text, from_undo=from_undo)
 
 
 class Action(Element):
@@ -72,21 +73,12 @@ class Scene(Element):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.unformatted = stringmanip.UnformattedText()
-        self.register_shortcut(
-            8, callback=self.on_backspace
-        )
 
     def insert_text(self, substring, from_undo=False):
         """Capitalize scene heading."""
-        self.unformatted.text += substring
-        print(self.unformatted.text)
+        self.unformatted.last_added = substring
         insert = substring.upper()
         super().insert_text(insert, from_undo)
-
-    def on_backspace(self):
-        """Track unaltered text on backspace."""
-        self.unformatted.resolve_deletion(self.text)
-        print(self.unformatted.text)
 
 
 class Character(Element):

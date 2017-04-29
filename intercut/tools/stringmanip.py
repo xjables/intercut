@@ -47,9 +47,43 @@ class UnformattedText:
 
     def __init__(self, text=''):
         self.text = text
+        self.last_added = ''
 
     # TODO: Add resolve_addition function or modify the resolve_deletion for
     # tracking additive_changes.
+
+    def resolve(self, input_text):
+        """A helper function for selecting resolution type.
+        
+        Args:
+            input_text: Text accessed from the TextInput.
+        """
+        if len(self.text) >= len(input_text):
+            self.resolve_deletion(input_text)
+        else:
+            self.resolve_insertion(input_text)
+        print(self.text)
+
+    def resolve_insertion(self, input_text):
+        """Adjust UnformattedText.text to follow insertions in TextInput.text
+        
+        Args:
+            input_text: Text accessed from the TextInput.
+        """
+        input_len = len(input_text)
+        unform_len = len(self.text)
+
+        assert input_len >= unform_len
+
+        slice_to = unform_len
+        for i in range(unform_len):
+            if self.text[i].upper() != input_text[i]:
+                slice_to = i
+                break
+
+        self.text = self.text[: slice_to]\
+                    + self.last_added\
+                    + self.text[slice_to:]
 
     def resolve_deletion(self, input_text):
         """Adjusts UnformattedText.text to follow deletions in TextInput.text
@@ -57,10 +91,7 @@ class UnformattedText:
         Args:
             input_text: Text accessed from the TextInput.
 
-        Returns:
-
         """
-
         input_len = len(input_text)
         unform_len = len(self.text)
         # cut_len is length of the word removed from the input
