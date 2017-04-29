@@ -19,7 +19,6 @@ class ElementBehavior(object):
 
     key_bindings = StringProperty('mods')
 
-
     def __init__(self, **kwargs):
         super(ElementBehavior, self).__init__(**kwargs)
 
