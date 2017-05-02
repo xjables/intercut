@@ -70,6 +70,7 @@ class UnformattedText:
         Args:
             input_text: Text accessed from the TextInput.
         """
+        # TODO:
         input_len = len(input_text)
         unform_len = len(self.text)
 
@@ -116,3 +117,13 @@ class UnformattedText:
 
         self.text = self.text[:slice_to] \
                     + self.text[(slice_to + cut_len):]
+
+    def strip_wrapping(self, text_input):
+        """Remove wrapping from incoming text_input.
+        
+        Args:
+            text_input: A formatted string for use in TextInput.text
+
+        Returns:
+            Unwrapped text.
+        """

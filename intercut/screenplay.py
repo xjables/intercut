@@ -17,6 +17,10 @@ class Screenplay(GridLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    def on_touch_move(self, touch):
+        """Return False to pass moving touch directly to children (Elements)"""
+        return False
+
     def add_element(self, source_element, added_element=Action):
         """Add an element to screenplay.
 
