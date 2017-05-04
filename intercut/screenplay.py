@@ -14,8 +14,22 @@ from elements import Action, Scene, Character, Dialogue
 
 Builder.load_file(r'screenplay.kv')
 
+# TODO: Write a ScreenplayBehavior that captures keyboard shortcuts concerning
+# TODO: the creation of elements, etc. ?Mixin with focus behavior?
+
 
 class Screenplay(CompoundSelectionBehavior, GridLayout):
+
+    """A collection of dialogue, action, and creative writing!
+    
+    A Screenplay object is simply a Kivy layout containing element objects.
+    That's it. Take note of the separation of concerns here. Screenplay does
+    not bother itself with the details of each element -- how they look, what
+    they can do -- but rather handles the aspects of managing their logistics,
+    (ie. position, creation)
+    
+    
+    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -40,7 +54,7 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
         self.parent.scroll_to(element)
 
     def add_widget(self, widget, **kwargs):
-        """Wrapper for Widget.add_widget() that updates element indices after
+        """Helper for Widget.add_widget() that updates element indices after
         adding new elements to the screenplay.
         """
         widget.bind(on_touch_move=self.left_click_move,
@@ -64,7 +78,7 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
         Args:
             element: The element object the user is hovering over. Passed by
                 event handler.
-            touch: Touch object for given event.
+            touch: Touch object for given input event.
         """
         if element.collide_point(*touch.pos):
             cursor = element.get_cursor_from_xy(*touch.pos)
@@ -74,6 +88,23 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
                 self.selection_span(element, touch)
 
     def selection_span(self, element, touch):
+        """Track selection across multiple elements.
+        
+        This method determines the range between the element initially selected
+        and the current element. For each element internal to this range, all
+        text is selected. The first and last elements are selected
+        appropriately.
+        
+        For all of the selections mentioned, <TextInput>.select_text is used to
+        select the text for each element.
+        
+        Args:
+            element: The element object the user is hovering over.
+            touch: Touch object for give input event.
+
+        Returns:
+
+        """
         # TODO: Edit this to handle selecting backwards properly.
         element.focus = True
         start = self._select_from_input.element_index
