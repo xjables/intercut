@@ -86,13 +86,15 @@ class ElementBehavior(object):
     def print_bindings(self):
         print(self.bindings)
 
+    def print_special(self):
+        print(self.special_keys)
+
     def keyboard_on_key_down(self, window, keycode, text, modifiers):
         # TODO: This function needs to be refactored.
         # This function is called on key_down event. This is where control is
         # passed to the behavior.
         key, key_str = keycode
-
-        is_special_key = str(key) in self.special_keys
+        is_special_key = (not modifiers) and (str(key) in self.special_keys)
 
         mod = modifiers[0] if modifiers else None
         if mod in ('alt', 'ctrl'):
@@ -100,19 +102,27 @@ class ElementBehavior(object):
         else:
             is_element_shortcut = False
 
+        # Only one of the blocks below should be triggers.
         if is_element_shortcut:
-            # Get callback from bindings and run it.
-            shortcut_callback = self.bindings[mod][str(key)]
-            shortcut_callback()
-        else:
-            # If no shortcut matches, pass control on to standard TextInput
-            # to try to match shortcuts.
-            super(ElementBehavior, self).keyboard_on_key_down(window, keycode,
-                                                                  text, modifiers)
+            assert not is_special_key
 
         if is_special_key:
             key_callback = self.special_keys[str(key)]
             key_callback()
+            super(ElementBehavior, self).keyboard_on_key_down(window, keycode,
+                                                              text, modifiers)
+            return True
+
+        if is_element_shortcut:
+            # Get callback from bindings and run it.
+            shortcut_callback = self.bindings[mod][str(key)]
+            shortcut_callback()
+            return True
+        else:
+            # If no shortcut matches, pass control on to standard TextInput
+            # to try to match shortcuts.
+            super(ElementBehavior, self).keyboard_on_key_down(window, keycode,
+                                                              text, modifiers)
 
     def delete_word_right(self):
         """Delete text right of the cursor to the end of the word."""

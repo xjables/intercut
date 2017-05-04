@@ -63,6 +63,16 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
         super().add_widget(widget, **kwargs)
         self._align_indices()
 
+    def remove_widget(self, widget, **kwargs):
+        """Helper function for removing elements from the screenplay.
+        
+        """
+        super().remove_widget(widget, **kwargs)
+        self._align_indices()
+
+    def get_element_by_index(self, element_index):
+        return self.children[element_index]
+
     def left_click_move(self, element, touch):
         """Track final highlighting position across elements.
         
@@ -142,6 +152,13 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
         #       ") to (", self._select_to_input,
         #       ", ", self._select_to_index,
         #       ")", sep='')
+
+    def get_element_from_index(self, element_index):
+        return self.children[element_index]
+
+    def set_focus_by_index(self, element_index):
+        element = self.get_element_by_index(element_index=element_index)
+        element.focus = True
 
     def _align_indices(self):
         """Align the indices of the Screenplay.children and the their own

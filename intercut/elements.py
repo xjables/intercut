@@ -25,6 +25,7 @@ from kivy.lang import Builder
 
 from elementbehavior import ElementBehavior
 from tools import stringmanip
+import time
 
 Builder.load_file(r'elements.kv')
 
@@ -42,9 +43,10 @@ class Element(ElementBehavior, TextInput):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-
         self.register_shortcut(  # 'ctrl' + backspace
-            8, modifier='ctrl', callback=self.delete_word_left) 
+            8, modifier='ctrl', callback=self.delete_word_left)
+        self.register_shortcut(  # backspace
+            8, callback=self.on_backspace)
         self.register_shortcut(  # 'ctrl' + delete
             127, modifier='ctrl', callback=self.delete_word_right)
 
@@ -57,6 +59,16 @@ class Element(ElementBehavior, TextInput):
         wrapped_text = textwrap.fill(to_wrap, width=30, drop_whitespace=False)
         # The line below makes on_text be called. This is bad.
         self.text = wrapped_text
+
+    def on_backspace(self):
+        slice_to = self.cursor_index()
+        focus_index = self.element_index
+        screenplay = self.parent
+
+        if self.text[:slice_to] == '':
+            screenplay.remove_widget(self)
+        screenplay.set_focus_by_index(focus_index)
+
 
     def get_length(self):
         return len(self.text)
