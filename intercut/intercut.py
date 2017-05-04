@@ -18,9 +18,9 @@ Builder.load_string('''
     Screenplay:
 ''')
 
+
 class ScrollableLabel(ScrollView):
     pass
-
 
 
 class MyApp(App):

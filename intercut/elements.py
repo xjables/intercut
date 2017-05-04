@@ -26,10 +26,6 @@ from kivy.lang import Builder
 from elementbehavior import ElementBehavior
 from tools import stringmanip
 
-
-
-
-
 Builder.load_file(r'elements.kv')
 
 
@@ -62,9 +58,8 @@ class Element(ElementBehavior, TextInput):
         # The line below makes on_text be called. This is bad.
         self.text = wrapped_text
 
-    def on_touch_move(self, touch):
-        print(self)
-        super().on_touch_move(touch)
+    def get_length(self):
+        return len(self.text)
 
 
 
