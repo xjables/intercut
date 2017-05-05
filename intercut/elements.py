@@ -61,20 +61,32 @@ class Element(ElementBehavior, TextInput):
         self.text = wrapped_text
 
     def on_backspace(self):
+        """Handle special backspace cases.
+
+        When backspace is pressed from the left-most position in the element,
+        the element is deleted. The remaining text in the element is transformed
+        into the format of the preceding element.
+        """
         slice_to = self.cursor_index()
         focus_index = self.element_index
         screenplay = self.parent
 
         if self.text[:slice_to] == '':
+            leftover_text = self.text[slice_to:]
             screenplay.remove_widget(self)
-        screenplay.set_focus_by_index(focus_index)
 
+            preceding_element = screenplay.get_element_from_index(focus_index)
+            preceding_element.focus = True
+
+            if leftover_text:
+                preceding_element.insert_text(leftover_text)
+                for char in range(len(leftover_text)):
+                    preceding_element.do_cursor_movement('cursor_left')
+                    print(preceding_element.cursor)
 
     def get_length(self):
+        """Return the length of the text string for an element."""
         return len(self.text)
-
-
-
 
 
 class Action(Element):
