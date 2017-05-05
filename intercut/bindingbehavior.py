@@ -10,17 +10,17 @@ Allows for a default text feature.
 from kivy.properties import StringProperty, NumericProperty
 
 
-__all__ = ('ElementBehavior', )
+__all__ = ('BindingBehavior',)
 
 
-class ElementBehavior(object):
+class BindingBehavior(object):
 
     """For modifying the behavior of TextInput"""
 
     key_bindings = StringProperty('mods')
 
     def __init__(self, **kwargs):
-        super(ElementBehavior, self).__init__(**kwargs)
+        super(BindingBehavior, self).__init__(**kwargs)
 
         self.bindings = {
             # Registered shortcuts will take the form str(keycode): callback
@@ -109,7 +109,7 @@ class ElementBehavior(object):
         if is_special_key:
             key_callback = self.special_keys[str(key)]
             key_callback()
-            super(ElementBehavior, self).keyboard_on_key_down(window, keycode,
+            super(BindingBehavior, self).keyboard_on_key_down(window, keycode,
                                                               text, modifiers)
             return True
 
@@ -121,33 +121,5 @@ class ElementBehavior(object):
         else:
             # If no shortcut matches, pass control on to standard TextInput
             # to try to match shortcuts.
-            super(ElementBehavior, self).keyboard_on_key_down(window, keycode,
+            super(BindingBehavior, self).keyboard_on_key_down(window, keycode,
                                                               text, modifiers)
-
-    def delete_word_right(self):
-        """Delete text right of the cursor to the end of the word."""
-        if self._selection:
-            return
-        start_index = self.cursor_index()
-        start_cursor = self.cursor
-        self.do_cursor_movement('cursor_right', control=True)
-        end_index = self.cursor_index()
-        if start_index != end_index:
-            s = self.text[start_index:end_index]
-            self._set_unredo_delsel(start_index, end_index, s, from_undo=False)
-            self.text = self.text[:start_index] + self.text[end_index:]
-            self._set_cursor(pos=start_cursor)
-
-    def delete_word_left(self):
-        """Delete text left of the cursor to the beginning of word."""
-        if self._selection:
-            return
-        start_index = self.cursor_index()
-        self.do_cursor_movement('cursor_left', control=True)
-        end_cursor = self.cursor
-        end_index = self.cursor_index()
-        if start_index != end_index:
-            s = self.text[end_index:start_index]
-            self._set_unredo_delsel(end_index, start_index, s, from_undo=False)
-            self.text = self.text[:end_index] + self.text[start_index:]
-            self._set_cursor(pos=end_cursor)

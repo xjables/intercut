@@ -23,14 +23,14 @@ from kivy.properties import StringProperty
 from kivy.properties import NumericProperty
 from kivy.lang import Builder
 
-from elementbehavior import ElementBehavior
+from elementbehavior import BindingBehavior
 from tools import stringmanip
 import time
 
 Builder.load_file(r'elements.kv')
 
 
-class Element(ElementBehavior, TextInput):
+class Element(BindingBehavior, TextInput):
 
     """A base class for all of the individual elements."""
 
@@ -87,6 +87,35 @@ class Element(ElementBehavior, TextInput):
     def get_length(self):
         """Return the length of the text string for an element."""
         return len(self.text)
+
+    def delete_word_right(self):
+        """Delete text right of the cursor to the end of the word."""
+        if self._selection:
+            return
+        start_index = self.cursor_index()
+        start_cursor = self.cursor
+        self.do_cursor_movement('cursor_right', control=True)
+        end_index = self.cursor_index()
+        if start_index != end_index:
+            s = self.text[start_index:end_index]
+            self._set_unredo_delsel(start_index, end_index, s, from_undo=False)
+            self.text = self.text[:start_index] + self.text[end_index:]
+            self._set_cursor(pos=start_cursor)
+
+    def delete_word_left(self):
+        """Delete text left of the cursor to the beginning of word."""
+        if self._selection:
+            return
+        start_index = self.cursor_index()
+        self.do_cursor_movement('cursor_left', control=True)
+        end_cursor = self.cursor
+        end_index = self.cursor_index()
+        if start_index != end_index:
+            s = self.text[end_index:start_index]
+            self._set_unredo_delsel(end_index, start_index, s, from_undo=False)
+            self.text = self.text[:end_index] + self.text[start_index:]
+            self._set_cursor(pos=end_cursor)
+
 
 
 class Action(Element):
