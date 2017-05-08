@@ -69,14 +69,14 @@ class Element(ElementBehavior, TextInput):
         """
         slice_to = self.cursor_index()
         focus_index = self.element_index
-        screenplay = self.parent
+        scene = self.parent
 
         if self.text[:slice_to] == '':
             leftover_text = self.text[slice_to:]
-            screenplay.remove_widget(self)
+            scene.remove_widget(self)
 
-            preceding_element = screenplay.get_element_from_index(focus_index)
-            preceding_element.focus = True
+            # preceding_element = scene.get_element_from_index(focus_index)
+            # preceding_element.focus = True
 
             if leftover_text:
                 preceding_element.insert_text(leftover_text)
@@ -95,7 +95,7 @@ class Action(Element):
         super().__init__(**kwargs)
 
 
-class Scene(Element):
+class SceneHeading(Element):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

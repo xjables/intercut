@@ -1,9 +1,10 @@
-#:import Scene scene
+#:import Scene elements
+#:import Action elements
 
 # elements are implemented in elements.py
 
 
-<Screenplay>:
+<Scene>:
     cols: 1
     touch_multiselect: True
     multiselect: True
@@ -15,7 +16,11 @@
         Rectangle:
             size: self.size
             pos: self.pos
-    Scene:
+    SceneHeading:
+        size_hint_y: None
+        text_size: self.width, None
+        font_size: 25
+    Character:
         size_hint_y: None
         text_size: self.width, None
         font_size: 25
