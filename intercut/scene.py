@@ -61,14 +61,14 @@ class Scene(CompoundSelectionBehavior, GridLayout):
                     on_touch_down=self.left_click_down,
                     on_touch_up=self.left_click_up)
         super().add_widget(widget, **kwargs)
-        self._align_indices()
+        self.parent._align_indices()
 
     def remove_element(self, element, **kwargs):
         """Helper function for removing elements from the screenplay.
 
         """
         super().remove_widget(element, **kwargs)
-        self._align_indices()
+        self.parent._align_indices()
 
     def get_element_by_index(self, element_index):
         return self.children[element_index]
@@ -122,7 +122,6 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         element.focus = True
         start = self._select_from_input.element_index
         end = self._select_to_input.element_index
-        print(start, end, sep=" ---- ")
         for element_index in range(end, start + 1):
             if element_index == start:
                 self.children[start].select_text(
@@ -161,14 +160,3 @@ class Scene(CompoundSelectionBehavior, GridLayout):
     def set_focus_by_index(self, element_index):
         element = self.get_element_by_index(element_index=element_index)
         element.focus = True
-
-    def _align_indices(self):
-        pass
-        # """Align the indices of the Screenplay.children and the their own
-        # element_index property.
-        #
-        # This should be called anytime the ordering of the Screenplay elements
-        # changes.
-        # """
-        # for i, child in enumerate(self.children):
-        #     child.element_index = i

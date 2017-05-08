@@ -6,8 +6,6 @@ A Screenplay is just a BoxLayout for carrying the actual Element widgets.
 
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.behaviors.compoundselection import CompoundSelectionBehavior
-from kivy.uix.behaviors.focus import FocusBehavior
-from colorpad import ColoredBoxLayout
 from kivy.lang import Builder
 
 from elements import Action, SceneHeading, Character, Dialogue
@@ -34,19 +32,14 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._select_from_index = 0
-        self._select_to_index = 0
-        self._select_to_input = None
-        self._select_from_input = None
 
-    def add_scene(self, source_element, added_element=Action):
+    def add_scene(self, source_element):
         """Add an element to screenplay.
 
         Note: added_element is a class, not an instance of the class.
 
         Args:
-            source_element: The element requesting that an element be added.
-            added_element: The element object to be inserted.
+            source_element: The element requesting that an be added.
         """
         new_scene = Scene()
         # Adding the widget at source_element's location adds it in place
@@ -63,106 +56,22 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
         # self._align_indices()
 
     def remove_widget(self, widget, **kwargs):
+        # FIXME: It probably shouldn't be possible to delete an entire scene.
         """Helper function for removing elements from the screenplay.
         
         """
         super().remove_widget(widget, **kwargs)
         # self._align_indices()
 
-    # def get_element_by_index(self, element_index):
-    #     return self.children[element_index]
+    def _align_indices(self):
+        """Align the indices of the Screenplay.children and the their own
+        element_index property.
 
-    # def left_click_move(self, element, touch):
-    #     """Track final highlighting position across elements.
-    #
-    #     The element argument is an instance of the element over which the user
-    #     hovers while dragging their cursor across the screen. Both this and
-    #     the touch object pass to this method update automatically.
-    #
-    #     This method determines where to stop the selection by storing both the
-    #     cursor index and element object on which the touch is released. If the
-    #     selection spans more than one element, <screenplay>.selection_span is
-    #     called to handle highlighting the appropriate interstitial elements.
-    #
-    #     Args:
-    #         element: The element object the user is hovering over. Passed by
-    #             event handler.
-    #         touch: Touch object for given input event.
-    #     """
-    #     if element.collide_point(*touch.pos):
-    #         cursor = element.get_cursor_from_xy(*touch.pos)
-    #         self._select_to_index = element.cursor_index(cursor)
-    #         self._select_to_input = element
-    #         if element.element_index != self._select_from_input.element_index:
-    #             self.selection_span(element, touch)
-    #
-    # def selection_span(self, element, touch):
-    #     """Track selection across multiple elements.
-    #
-    #     This method determines the range between the element initially selected
-    #     and the current element. For each element internal to this range, all
-    #     text is selected. The first and last elements are selected
-    #     appropriately.
-    #
-    #     For all of the selections mentioned, <TextInput>.select_text is used to
-    #     select the text for each element.
-    #
-    #     Args:
-    #         element: The element object the user is hovering over.
-    #         touch: Touch object for give input event.
-    #
-    #     Returns:
-    #
-    #     """
-    #     # TODO: Edit this to handle selecting backwards properly.
-    #     element.focus = True
-    #     start = self._select_from_input.element_index
-    #     end = self._select_to_input.element_index
-    #     for element_index in range(end, start + 1):
-    #         if element_index == start:
-    #             self.children[start].select_text(
-    #                 self._select_from_index,
-    #                 self._select_from_input.get_length()
-    #                 )
-    #         elif element_index == end:
-    #             self.children[end].select_text(0, self._select_to_index)
-    #         else:
-    #             self.children[element_index].select_all()
-    #
-    # def left_click_down(self, element, touch):
-    #     # All elements see this event, so this clears every element selection
-    #     element.cancel_selection()
-    #     if element.collide_point(*touch.pos):
-    #         element.cancel_selection()
-    #         cursor = element.get_cursor_from_xy(*touch.pos)
-    #         self._select_from_index = element.cursor_index(cursor)
-    #         self._select_from_input = element
-    #         print("Selecting from (", element.element_index, ",",
-    #               self._select_from_index, ")", sep='')
-    #
-    # def left_click_up(self, element, touch):
-    #     # FIXME: Why is this being called twice for certain elements?!!
-    #     self._select_from_index = 0
-    #     self._select_from_input = None
-    #     # print("(", self._select_from_input,
-    #     #       ", ", self._select_from_index,
-    #     #       ") to (", self._select_to_input,
-    #     #       ", ", self._select_to_index,
-    #     #       ")", sep='')
-    #
-    # # def get_element_from_index(self, element_index):
-    # #     return self.children[element_index]
-    #
-    # # def set_focus_by_index(self, element_index):
-    # #     element = self.get_element_by_index(element_index=element_index)
-    # #     element.focus = True
-    #
-    # # def _align_indices(self):
-    # #     """Align the indices of the Screenplay.children and the their own
-    # #     element_index property.
-    # #
-    # #     This should be called anytime the ordering of the Screenplay elements
-    # #     changes.
-    # #     """
-    # #     for i, child in enumerate(self.children):
-    # #         child.element_index = i
+        This should be called anytime the ordering of the Screenplay elements
+        changes.
+        """
+        absolute_index = 0
+        for scene in self.children:
+            for element in scene.children:
+                element.element_index = absolute_index
+                absolute_index += 1
