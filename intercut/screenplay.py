@@ -8,7 +8,6 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.behaviors.compoundselection import CompoundSelectionBehavior
 from kivy.lang import Builder
 
-from elements import Action, SceneHeading, Character, Dialogue
 from scene import Scene
 
 Builder.load_file(r'screenplay.kv')

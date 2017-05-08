@@ -148,11 +148,6 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         # FIXME: Why is this being called twice for certain elements?!!
         self._select_from_index = 0
         self._select_from_input = None
-        # print("(", self._select_from_input,
-        #       ", ", self._select_from_index,
-        #       ") to (", self._select_to_input,
-        #       ", ", self._select_to_index,
-        #       ")", sep='')
 
     def get_element_from_index(self, element_index):
         return self.children[element_index]
