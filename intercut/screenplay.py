@@ -32,25 +32,23 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def add_scene(self, source_element):
+    def add_scene(self):
         """Add an element to screenplay.
 
         Note: added_element is a class, not an instance of the class.
 
         Args:
-            source_element: The element requesting that an be added.
+            calling_scene: The scene in which a new scene heading was created.
         """
         new_scene = Scene()
-        # Adding the widget at source_element's location adds it in place
-        self.add_widget(new_scene, index=source_element.parent.scene_index)
+        self.add_widget(new_scene)
+
+        return new_scene
 
     def add_widget(self, widget, **kwargs):
         """Helper for Widget.add_widget() that updates element indices after
         adding new elements to the screenplay.
         """
-        # widget.bind(on_touch_move=self.left_click_move,
-        #             on_touch_down=self.left_click_down,
-        #             on_touch_up=self.left_click_up)
         super().add_widget(widget, **kwargs)
         # self._align_indices()
 

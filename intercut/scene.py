@@ -28,10 +28,10 @@ class Scene(CompoundSelectionBehavior, GridLayout):
 
 
     """
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.scene_index = 0
+        # Selection parameters
         self._select_from_index = 0
         self._select_to_index = 0
         self._select_to_input = None
@@ -46,11 +46,11 @@ class Scene(CompoundSelectionBehavior, GridLayout):
             source_element: The element requesting that an element be added.
             added_element: The element object to be inserted.
         """
-
         element = added_element()
-        element.focus = True
         # Adding the widget at source_element's location adds it in place
         self.add_widget(element, index=source_element.element_index)
+
+        element.focus = True
         self.parent.parent.scroll_to(element)
 
     def add_widget(self, widget, **kwargs):
@@ -61,7 +61,7 @@ class Scene(CompoundSelectionBehavior, GridLayout):
                     on_touch_down=self.left_click_down,
                     on_touch_up=self.left_click_up)
         super().add_widget(widget, **kwargs)
-        self.parent._align_indices()
+        # self.parent._align_indices()
 
     def remove_element(self, element, **kwargs):
         """Helper function for removing elements from the screenplay.
@@ -69,6 +69,24 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         """
         super().remove_widget(element, **kwargs)
         self.parent._align_indices()
+
+    def split_scene(self):
+        """Split a scene at a particular element.
+        
+        This function splits a scene at the element given to it. That element
+        is included in the new scene. Any subsequent elements in the scene are
+        also transferred to the new scene.
+        
+        Args:
+            element: The element that will become the first element of the new
+                scene.
+
+        Returns:
+
+        """
+        screenplay = self.parent
+        new_scene = screenplay.add_scene()
+        # self.children = self.children[:element.element_index]
 
     def get_element_by_index(self, element_index):
         return self.children[element_index]
