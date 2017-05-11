@@ -26,6 +26,7 @@ class ScrollableLabel(ScrollView):
 class MyApp(App):
 
     def build(self):
+        self.title = "InterXut"
         return ScrollableLabel()
 
 
