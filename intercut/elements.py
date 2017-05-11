@@ -36,6 +36,7 @@ class Element(ElementBehavior, TextInput):
 
     # This will be used to track the elements location in the SP directly.
     element_index = NumericProperty()
+    wrap_length = NumericProperty(30)
     # TextInput.text is the displayed text. It will have formatting in it such
     # as capitalizations and wrapping newline characters. This text will remain
     # unformatted in the background.
@@ -51,14 +52,14 @@ class Element(ElementBehavior, TextInput):
             127, modifier='ctrl', callback=self.delete_word_right)
 
     def insert_text(self, substring, from_undo=False):
-        # TODO: Clip spaces at the beginning of lines post wrap.
         # TODO: Dynamically resize TextInput so it does not clip any of the
         #       inputted text from view. SEE: texture_size...
         unwrapped = self.text.replace('\n', '')
         to_wrap = unwrapped + substring
-        wrapped_text = textwrap.fill(to_wrap, width=30, drop_whitespace=False)
+        wrapped_text = textwrap.fill(to_wrap, width=self.wrap_length,
+                                     drop_whitespace=False)
         # The line below makes on_text be called. This is bad.
-        self.text = wrapped_text
+        self.text = textwrap.dedent(wrapped_text)
 
     def on_backspace(self):
         """Handle special backspace cases.

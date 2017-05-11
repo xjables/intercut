@@ -2,27 +2,36 @@
 
 <Element>:
     size_hint_y: None
-    text_size: self.width, None
-    font_size: 25
+    height: self.minimum_height
+    text_size: 1500, None
     background_color: [1, 1, 1, 0]
     font_name: r'courier.ttf'
     font_size: 24
+
+    padding_y: [0, 0]
     cursor_color: [0, 0, 0, 1]
     multiline: False
 
 <Action>:
     hint_text: '[Action]'
-    on_text_validate: print(self.parent) #self.parent.add_element(self, added_element=elements.Action)
+    padding_x: '1.5in'
+    wrap_length: 60
+    on_text_validate: self.parent.add_element(self, added_element=elements.Action)
 
 <SceneHeading>:
     hint_text: '[SCENE]'
-    on_text: self.unformatted.resolve(self.text)
+    padding_x: ['1.5in', 0]
+    wrap_length: 60
     on_text_validate: self.parent.add_element(self, added_element=elements.Action)
 
 <Character>:
-    hint_text: '[Character]'
+    hint_text: '[CHARACTER]'
+    padding_x: ['3.5in', 0]
+    wrap_length: 30
     on_text_validate: self.parent.add_element(self, added_element=elements.Dialogue)
 
 <Dialogue>:
     hint_text: '[Dialogue]'
+    padding_x: ['2.5in', 0]
+    wrap_length: 35
     on_text_validate: self.parent.add_element(self, added_element=elements.Character)

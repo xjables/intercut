@@ -1,5 +1,7 @@
 #:import Scene elements
 #:import Action elements
+#:import Character elements
+#:import SceneHeading elements
 
 # elements are implemented in elements.py
 
@@ -12,15 +14,8 @@
     height: self.minimum_height
     canvas.before:
         Color:
-            rgba: (1, 1, 1, 1)
+            rgba: [1, 1, 1, 1]
         Rectangle:
             size: self.size
             pos: self.pos
     SceneHeading:
-        size_hint_y: None
-        text_size: self.width, None
-        font_size: 25
-    Character:
-        size_hint_y: None
-        text_size: self.width, None
-        font_size: 25

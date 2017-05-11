@@ -9,13 +9,16 @@
     multiselect: True
     size_hint_y: None
     height: self.minimum_height
+    bar_color: [1, 1, 0, 1]
     canvas.before:
         Color:
-            rgba: (1, 1, 1, 1)
+            rgba: [1, 1, 1, 1]
         Rectangle:
             size: self.size
             pos: self.pos
     Scene:
-        size_hint_y: None
-        text_size: self.width, None
-        font_size: 25
+        SceneHeading:
+            size_hint_y: None
+            text_size: self.width, None
+            font_size: 25
+        Character:
