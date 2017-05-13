@@ -16,7 +16,7 @@ def remove_last_word(string):
         return partition[0] + " "
 
 
-class UnformattedText:
+class RawText:
     """Hold and modify unformatted text for Text Inputs.
 
     This should be implemented as an attribute in subclasses of TextInput in

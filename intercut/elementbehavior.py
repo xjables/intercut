@@ -33,7 +33,7 @@ class ElementBehavior(object):
         # register_shortcut
         self.special_keys = {}
 
-    def register_shortcut(self, keycode, callback, modifier=None):
+    def register_shortcut(self, keycode, callback, modifier=None, kill=True):
         """Register a text input shortcut.
 
         Use register_shortcut in the class __init__.
@@ -51,16 +51,17 @@ class ElementBehavior(object):
                 modifiers.
             callback (function object): The function to run on key shortcut
                 capture.
+            kill (bool): Kill the signal after use or pass it to TextInput.
         """
         if modifier:
             try:
-                self.bindings[modifier][str(keycode)] = callback
+                self.bindings[modifier][str(keycode)] = (callback, kill)
             except KeyError as err:
                 raise err
 
         else:
             try:
-                self.special_keys[str(keycode)] = callback
+                self.special_keys[str(keycode)] = (callback, kill)
             except KeyError as err:
                 raise err
 
@@ -107,17 +108,17 @@ class ElementBehavior(object):
             assert not is_special_key
 
         if is_special_key:
-            key_callback = self.special_keys[str(key)]
+            key_callback, kill = self.special_keys[str(key)]
             key_callback()
-            super(ElementBehavior, self).keyboard_on_key_down(window, keycode,
-                                                              text, modifiers)
-            return True
+            if kill:
+                return kill
 
         if is_element_shortcut:
             # Get callback from bindings and run it.
-            shortcut_callback = self.bindings[mod][str(key)]
+            shortcut_callback, kill = self.bindings[mod][str(key)]
             shortcut_callback()
-            return True
+            if kill:
+                return kill
         else:
             # If no shortcut matches, pass control on to standard TextInput
             # to try to match shortcuts.
@@ -127,6 +128,7 @@ class ElementBehavior(object):
     def delete_word_right(self):
         """Delete text right of the cursor to the end of the word."""
         if self._selection:
+            self.delete_selection()
             return
         start_index = self.cursor_index()
         start_cursor = self.cursor
@@ -141,6 +143,7 @@ class ElementBehavior(object):
     def delete_word_left(self):
         """Delete text left of the cursor to the beginning of word."""
         if self._selection:
+            self.delete_selection()
             return
         start_index = self.cursor_index()
         self.do_cursor_movement('cursor_left', control=True)
