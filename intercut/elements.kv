@@ -6,15 +6,15 @@
     text_size: 1500, None
     background_color: [1, 1, 1, 0]
     font_name: r'courier.ttf'
-    font_size: 24
+    font_size: '12pt'
 
     padding_y: [0, 0]
     cursor_color: [0, 0, 0, 1]
-    multiline: False
+    multiline: True
 
 <Action>:
     hint_text: '[Action]'
-    padding_x: '1.5in'
+    padding_x: ['1.5in', 0]
     wrap_length: 60
     on_text_validate: self.parent.add_element(self, added_element=elements.Action)
 

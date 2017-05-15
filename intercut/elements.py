@@ -94,6 +94,9 @@ class Action(Element):
         scene = self.parent
         scene.add_element(self, added_element=Dialogue)
 
+    def tab_to(self):
+        pass
+
 
 class SceneHeading(Element):
 
