@@ -3,6 +3,7 @@ from kivy.core.window import EventLoop
 
 from tools import stringmanip
 
+import re
 import textwrap
 
 FL_IS_LINEBREAK = 0x01
@@ -68,11 +69,9 @@ class CoreInput(TextInput):
 
         start, finish, lines, \
             lineflags, len_lines = self._get_line_from_cursor(cr, new_text)
-        # calling trigger here could lead to wrong cursor positioning
-        # and repeating of text when keys are added rapidly in a automated
-        # fashion. From Android Keyboard for example.
+
         self._refresh_text_from_property('insert', start, finish, lines,
-                                             lineflags, len_lines)
+                                         lineflags, len_lines)
 
         self.cursor = self.get_cursor_from_index(ci + len_str)
         # handle undo and redo
@@ -141,11 +140,16 @@ class CoreInput(TextInput):
             lines_flags_append(flags)
         return lines, lines_flags
 
-
-
-
-
-
-
-
-
+    def _tokenize(self, text):
+        # Tokenize a text string from some delimiters
+        if text is None:
+            return
+        delimiters = u' \n\r\t'
+        oldindex = 0
+        for index, char in enumerate(text):
+            if char not in delimiters:
+                continue
+            if char == ' ':
+                yield text[oldindex:index + 1]
+            oldindex = index + 1
+        yield text[oldindex:]
