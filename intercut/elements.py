@@ -45,7 +45,7 @@ class Element(ElementBehavior, CoreInput):
         super().__init__(**kwargs)
 
         self.register_shortcut(  # enter
-            13, callback=self.on_enter)
+            13, callback=self.next_element)
         self.register_shortcut(  # backspace
             8, callback=self.on_backspace, kill=False)
         self.register_shortcut(  # tab
@@ -79,10 +79,6 @@ class Element(ElementBehavior, CoreInput):
             #     for char in range(len(leftover_text)):
             #         preceding_element.do_cursor_movement('cursor_left')
             #         print(preceding_element.cursor)
-
-    def on_enter(self):
-        self.right_justify()
-        self.next_element()
 
     def get_length(self):
         """Return the length of the text string for an element."""
