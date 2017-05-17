@@ -50,7 +50,7 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
         adding new elements to the screenplay.
         """
         super().add_widget(widget, **kwargs)
-        # self._align_indices()
+        # self.align_all_indices()
 
     def remove_widget(self, widget, **kwargs):
         # FIXME: It probably shouldn't be possible to delete an entire scene.
@@ -58,17 +58,15 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
         
         """
         super().remove_widget(widget, **kwargs)
-        # self._align_indices()
+        # self.align_all_indices()
 
-    def _align_indices(self):
+    def align_all_indices(self):
         """Align the indices of the Screenplay.children and the their own
         element_index property.
 
         This should be called anytime the ordering of the Screenplay elements
         changes.
         """
-        absolute_index = 0
-        for scene in self.children:
-            for element in scene.children:
-                element.element_index = absolute_index
-                absolute_index += 1
+        for s_index, scene in enumerate(self.children):
+            scene.scene_index = s_index
+            scene.align_scene_indices()

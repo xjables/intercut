@@ -37,6 +37,10 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         self._select_to_input = None
         self._select_from_input = None
 
+    def align_scene_indices(self):
+        for e_index, element in enumerate(self.children):
+            element.element_index = e_index
+
     def add_element(self, source_element, added_element=Action):
         """Add an element to scene.
 
@@ -61,14 +65,19 @@ class Scene(CompoundSelectionBehavior, GridLayout):
                     on_touch_down=self.left_click_down,
                     on_touch_up=self.left_click_up)
         super().add_widget(widget, **kwargs)
-        # self.parent._align_indices()
+        self.align_scene_indices()
 
     def remove_element(self, element, **kwargs):
         """Helper function for removing elements from the screenplay.
 
         """
+        new_index = element.element_index
         super().remove_widget(element, **kwargs)
-        self.parent._align_indices()
+        self.align_scene_indices()
+        f_element = self.get_element_by_index(new_index)
+        f_element.focus = True
+
+
 
     def split_scene(self):
         """Split a scene at a particular element.

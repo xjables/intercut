@@ -4,15 +4,13 @@ from kivy.core.window import EventLoop
 from tools import stringmanip
 
 import re
-import textwrap
 
 FL_IS_LINEBREAK = 0x01
 FL_IS_WORDBREAK = 0x02
 FL_IS_NEWLINE = FL_IS_LINEBREAK | FL_IS_WORDBREAK
 
+
 class CoreInput(TextInput):
-
-
 
     def __init__(self, **kwargs):
         self.raw_text = stringmanip.RawText()

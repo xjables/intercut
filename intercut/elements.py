@@ -35,7 +35,6 @@ class Element(ElementBehavior, CoreInput):
 
     """A base class for all of the individual elements."""
 
-    # This will be used to track the elements location in the SP directly.
     element_index = NumericProperty()
     # TextInput.text is the displayed text. It will have formatting in it such
     # as capitalizations and wrapping newline characters. This text will remain
@@ -43,6 +42,8 @@ class Element(ElementBehavior, CoreInput):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # This will be used to track the elements location in the SP directly.
+        self.element_index = 0
 
         self.register_shortcut(  # enter
             13, callback=self.next_element)
@@ -55,6 +56,15 @@ class Element(ElementBehavior, CoreInput):
             8, modifier='ctrl', callback=self.delete_word_left)
         self.register_shortcut(  # 'ctrl' + delete
             127, modifier='ctrl', callback=self.delete_word_right)
+
+    def get_location(self):
+        """Retrieve the coordinates of this element.
+        
+        Returns:
+            tuple: Tuple containing (scene_index, element_index)
+        """
+        scene = self.parent
+        return scene.scene_index, self.element_index
 
     def on_backspace(self):
         """Handle special backspace cases.
@@ -69,7 +79,7 @@ class Element(ElementBehavior, CoreInput):
 
         if self.text[:slice_to] == '':
             leftover_text = self.text[slice_to:]
-            scene.remove_widget(self)
+            scene.remove_element(self)
 
             # preceding_element = scene.get_element_from_index(focus_index)
             # preceding_element.focus = True
@@ -120,6 +130,11 @@ class Character(Element):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    def insert_text(self, substring, from_undo=False):
+        """Capitalize scene heading."""
+        insert = substring.upper()
+        super().insert_text(insert, from_undo=from_undo)
 
     def next_element(self):
         scene = self.parent

@@ -8,7 +8,7 @@
     font_name: r'courier.ttf'
     font_size: '12pt'
 
-    padding_y: [0, 0]
+    padding_y: [self.line_height/2]
     cursor_color: [0, 0, 0, 1]
     multiline: True
 
@@ -27,11 +27,13 @@
 <Character>:
     hint_text: '[CHARACTER]'
     padding_x: ['3.5in', 0]
+    padding_y: [self.line_height/2, 0]
     wrap_length: 30
     on_text_validate: self.parent.add_element(self, added_element=elements.Dialogue)
 
 <Dialogue>:
     hint_text: '[Dialogue]'
     padding_x: ['2.5in', 0]
+    padding_y: [0, self.line_height/2]
     wrap_length: 35
     on_text_validate: self.parent.add_element(self, added_element=elements.Character)
