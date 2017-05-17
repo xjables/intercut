@@ -47,7 +47,7 @@ class RawText:
 
     def __init__(self, text=''):
         self.text = text
-        self.last_added = ''
+        self.tracked = ''
 
     # TODO: Add resolve_addition function or modify the resolve_deletion for
     # tracking additive_changes.
@@ -58,11 +58,15 @@ class RawText:
         Args:
             input_text: Text accessed from the TextInput.
         """
+        print(input_text)
+        print(self.text)
         if len(self.text) >= len(input_text):
+            print("DELETION")
             self.resolve_deletion(input_text)
         else:
+            print("INSERTION")
             self.resolve_insertion(input_text)
-        print(self.text)
+
 
     def resolve_insertion(self, input_text):
         """Adjust UnformattedText.text to follow insertions in TextInput.text
@@ -76,6 +80,8 @@ class RawText:
 
         assert input_len >= unform_len
 
+        len_diff = input_len - unform_len
+
         slice_to = unform_len
         for i in range(unform_len):
             if self.text[i].upper() != input_text[i]:
@@ -83,7 +89,7 @@ class RawText:
                 break
 
         self.text = self.text[: slice_to]\
-                    + self.last_added\
+                    + (self.tracked if self.tracked else input_text[slice_to: slice_to + len_diff]) \
                     + self.text[slice_to:]
 
     def resolve_deletion(self, input_text):
@@ -117,13 +123,3 @@ class RawText:
 
         self.text = self.text[:slice_to] \
                     + self.text[(slice_to + cut_len):]
-
-    def strip_wrapping(self, text_input):
-        """Remove wrapping from incoming text_input.
-        
-        Args:
-            text_input: A formatted string for use in TextInput.text
-
-        Returns:
-            Unwrapped text.
-        """

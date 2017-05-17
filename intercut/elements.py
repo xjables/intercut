@@ -25,7 +25,7 @@ from kivy.lang import Builder
 
 from elementbehavior import ElementBehavior
 from textinput import CoreInput
-from tools import stringmanip
+from tools.stringmanip import RawText
 import time
 
 Builder.load_file(r'elements.kv')
@@ -44,6 +44,7 @@ class Element(ElementBehavior, CoreInput):
         super().__init__(**kwargs)
         # This will be used to track the elements location in the SP directly.
         self.element_index = 0
+        self.raw_text = ''
 
         self.register_shortcut(  # enter
             13, callback=self.next_element)
@@ -94,11 +95,37 @@ class Element(ElementBehavior, CoreInput):
         """Return the length of the text string for an element."""
         return len(self.text)
 
+    def raw_contraction(self):
+        # TODO: Rework this a little (it is bount to on_text)
+        len_txt = len(self.text)
+        len_raw = len(self.raw_text)
+        raw_text = self.raw_text
+
+        if len_raw > len_txt:
+            cut_len = len_raw - len_txt
+            slice_to = 0
+            try:
+                for index, char in enumerate(self.raw_text):
+                    if char.upper() != self.text[index]:
+                        slice_to = index
+                        break
+            except IndexError:
+                slice_to = len_txt
+            self.raw_text = raw_text[:slice_to] + raw_text[slice_to + cut_len:]
+            print(self.raw_text)
+
 
 class Action(Element):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    def insert_text(self, substring, from_undo=False):
+        raw_text = self.raw_text
+        slice_to = self.cursor_index()
+        self.raw_text = raw_text[:slice_to] + substring + raw_text[slice_to:]
+        print(self.raw_text)
+        super().insert_text(substring, from_undo=from_undo)
 
     def next_element(self):
         scene = self.parent
@@ -115,6 +142,10 @@ class SceneHeading(Element):
 
     def insert_text(self, substring, from_undo=False):
         """Capitalize scene heading."""
+        raw_text = self.raw_text
+        slice_to = self.cursor_index()
+        self.raw_text = raw_text[:slice_to] + substring + raw_text[slice_to:]
+        print(self.raw_text)
         insert = substring.upper()
         super().insert_text(insert, from_undo=from_undo)
 
@@ -133,6 +164,10 @@ class Character(Element):
 
     def insert_text(self, substring, from_undo=False):
         """Capitalize scene heading."""
+        raw_text = self.raw_text
+        slice_to = self.cursor_index()
+        self.raw_text = raw_text[:slice_to] + substring + raw_text[slice_to:]
+        print(self.raw_text)
         insert = substring.upper()
         super().insert_text(insert, from_undo=from_undo)
 
@@ -148,6 +183,14 @@ class Dialogue(Element):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    def insert_text(self, substring, from_undo=False):
+        """Capitalize scene heading."""
+        raw_text = self.raw_text
+        slice_to = self.cursor_index()
+        self.raw_text = raw_text[:slice_to] + substring + raw_text[slice_to:]
+        print(self.raw_text)
+        super().insert_text(substring, from_undo=from_undo)
 
     def next_element(self):
         scene = self.parent

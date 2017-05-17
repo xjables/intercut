@@ -17,6 +17,23 @@ class CoreInput(TextInput):
         self.wrap_length = 30
         super(CoreInput, self).__init__(**kwargs)
 
+    def _cut(self, data):
+        """Override TextInput._cut to grab from raw_text.
+        
+        Using raw_text instead of the TextInput.text to cut from, we preserve
+        the capitalization that the user input even when typing into
+        SceneHeading and Character inputs.
+        
+        Args:
+            data: Data stripped from TextInput
+        """
+        a = self.selection_from
+        b = self.selection_to
+        if a > b:
+            a, b = b, a
+        cut_text = self.raw_text[a:b]
+        super(CoreInput, self)._cut(data=cut_text)
+
     def insert_text(self, substring, from_undo=False):
         '''Insert new text at the current cursor position. Override this
         function in order to pre-process text for input validation.
