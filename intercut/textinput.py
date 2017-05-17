@@ -27,12 +27,28 @@ class CoreInput(TextInput):
         Args:
             data: Data stripped from TextInput
         """
+        cut_text = self.get_raw_selection_text()
+        super(CoreInput, self)._cut(data=cut_text)
+
+    def copy(self, data=''):
+        if data:
+            super(CoreInput, self).copy(data=data)
+        else:
+            copy_text = self.get_raw_selection_text()
+            super(CoreInput, self).copy(data=copy_text)
+
+    def get_raw_selection_text(self):
+        """Get the selection text from raw_text.
+        
+        Returns:
+            str: A string of the raw text version of what is selected.
+
+        """
         a = self.selection_from
         b = self.selection_to
         if a > b:
             a, b = b, a
-        cut_text = self.raw_text[a:b]
-        super(CoreInput, self)._cut(data=cut_text)
+        return self.raw_text[a:b]
 
     def insert_text(self, substring, from_undo=False):
         '''Insert new text at the current cursor position. Override this
