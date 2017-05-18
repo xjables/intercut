@@ -57,6 +57,11 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         element.focus = True
         self.parent.parent.scroll_to(element)
 
+    # TODO: Now that raw_text is implemented, create a transform_element method
+    # TODO: transforms one element into another by creating a new element,
+    # TODO: copies over relevant information and deletes the old one. This will
+    # TODO: involve add_element->"do the copy"->remove_element
+
     def add_widget(self, widget, **kwargs):
         """Helper for Widget.add_widget() that updates element indices after
         adding new elements to the screenplay.
