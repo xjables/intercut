@@ -20,6 +20,7 @@ import textwrap
 
 from kivy.uix.textinput import TextInput
 from kivy.uix.dropdown import DropDown
+from kivy.uix.button import Button
 from kivy.properties import ListProperty
 from kivy.properties import NumericProperty
 from kivy.lang import Builder
@@ -124,22 +125,56 @@ class SuggestiveElement(Element):
     characters and locations as the user types.
     """
 
+    source = ListProperty()
+
     def __init__(self, **kwargs):
-        self.drop_down = DropDown()
         super().__init__(**kwargs)
+        self.drop_down = DropDown()
+        dd = self.drop_down
+        dd.bind(on_select=self.on_select)
+
+    def on_source(self, instance, suggestions):
+        """When drop_source changes, update DropDown options.
+        
+        Args:
+            instance: 
+                Catches another instance of self passed by the event handler.
+            suggestions: 
+                The actual list of established characters/locations
+        """
+        print('on_source')
+        dd = self.drop_down
+        dd.clear_widgets()
+        for suggestion in suggestions:
+            print('line_height', self.line_height)
+            button = Button(text=suggestion, size_hint_y=None, height=30)
+            button.bind(on_release=lambda btn: dd.select(btn.text))
+            dd.add_widget(button)
+
+    def on_select(self, instance, text):
+        """Change Element text to selected text."""
+        self.text = ''
+        self.insert_text(substring=text, from_undo=False)
+
+    def on_text(self, instance, value):
+        text = self.text
+        if not text:
+            self.drop_down.dismiss()
+        else:
+            self.drop_down.open(self)
+
+    def insert_text(self, substring, from_undo=False):
+        raw_text = self.raw_text
+        slice_to = self.cursor_index()
+        self.raw_text = raw_text[:slice_to] + substring + raw_text[slice_to:]
+        insert = substring.upper()
+        super().insert_text(insert, from_undo=from_undo)
 
 
 class Action(Element):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-    def insert_text(self, substring, from_undo=False):
-        raw_text = self.raw_text
-        slice_to = self.cursor_index()
-        self.raw_text = raw_text[:slice_to] + substring + raw_text[slice_to:]
-        print(self.raw_text)
-        super().insert_text(substring, from_undo=from_undo)
 
     def next_element(self):
         scene = self.parent
@@ -154,18 +189,10 @@ class SceneHeading(SuggestiveElement):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def insert_text(self, substring, from_undo=False):
-        """Capitalize scene heading."""
-        raw_text = self.raw_text
-        slice_to = self.cursor_index()
-        self.raw_text = raw_text[:slice_to] + substring + raw_text[slice_to:]
-        print(self.raw_text)
-        insert = substring.upper()
-        super().insert_text(insert, from_undo=from_undo)
-
     def next_element(self):
         scene = self.parent
         scene.add_element(self, added_element=Action)
+        self.drop_down.dismiss()
 
     def tab_to(self):
         pass
@@ -176,17 +203,10 @@ class Character(SuggestiveElement):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def insert_text(self, substring, from_undo=False):
-        """Capitalize scene heading."""
-        raw_text = self.raw_text
-        slice_to = self.cursor_index()
-        self.raw_text = raw_text[:slice_to] + substring + raw_text[slice_to:]
-        insert = substring.upper()
-        super().insert_text(insert, from_undo=from_undo)
-
     def next_element(self):
         scene = self.parent
         scene.add_element(self, added_element=Dialogue)
+        self.drop_down.dismiss()
 
     def tab_to(self):
         pass
