@@ -19,12 +19,13 @@ Parenthetical:
 import textwrap
 
 from kivy.uix.textinput import TextInput
-from kivy.properties import StringProperty
+from kivy.uix.dropdown import DropDown
+from kivy.properties import ListProperty
 from kivy.properties import NumericProperty
 from kivy.lang import Builder
 
 from elementbehavior import ElementBehavior
-from textinput import CoreInput
+from coreinput import CoreInput
 from tools.stringmanip import RawText
 import time
 
@@ -115,6 +116,19 @@ class Element(ElementBehavior, CoreInput):
             print(self.raw_text)
 
 
+class SuggestiveElement(Element):
+    """A special type of element that provides text completion DropDown.
+    
+    This class is designed for Character and SceneHeading elements with the
+    intent that they will provide a DropDown list of already established
+    characters and locations as the user types.
+    """
+
+    def __init__(self, **kwargs):
+        self.drop_down = DropDown()
+        super().__init__(**kwargs)
+
+
 class Action(Element):
 
     def __init__(self, **kwargs):
@@ -135,7 +149,7 @@ class Action(Element):
         pass
 
 
-class SceneHeading(Element):
+class SceneHeading(SuggestiveElement):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -157,7 +171,7 @@ class SceneHeading(Element):
         pass
 
 
-class Character(Element):
+class Character(SuggestiveElement):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -167,7 +181,6 @@ class Character(Element):
         raw_text = self.raw_text
         slice_to = self.cursor_index()
         self.raw_text = raw_text[:slice_to] + substring + raw_text[slice_to:]
-        print(self.raw_text)
         insert = substring.upper()
         super().insert_text(insert, from_undo=from_undo)
 
