@@ -31,7 +31,7 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
     """
 
     def __init__(self, **kwargs):
-        self.characters = ['Cameron', 'Jamison', 'Drew', 'Dobby', 'Dave']
+        self.characters = []
         self.locations = []
         super().__init__(**kwargs)
 
@@ -74,18 +74,23 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
             scene.scene_index = s_index
             scene.align_scene_indices()
 
-    def update_characters(self):
-        tmp = []
-        for scene in self.children:
-            for element in scene.children:
-                if isinstance(element, Character):
-                    tmp.append(element)
-        print(tmp)
+    def update_characters(self, new_character):
+        if new_character:
+            character = new_character.strip()
+            lower_character = character.lower()
+            lower_characters = [char.lower() for char in self.characters]
+            if lower_character in lower_characters:
+                return
+            else:
+                self.characters.append(character)
 
-    def update_location(self):
-        tmp = []
-        for scene in self.children:
-            for element in scene.children:
-                if isinstance(element, SceneHeading):
-                    tmp.append(element)
-        print(tmp)
+    def update_locations(self, new_location):
+        if new_location:
+            location = new_location.strip()
+            lower_loc = location.lower()
+            lower_locs = [scn.lower() for scn in self.locations]
+            if lower_loc in lower_locs:
+                return
+            else:
+                self.locations.append(location)
+            print(self.locations)

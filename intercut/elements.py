@@ -19,7 +19,7 @@ Parenthetical:
 import textwrap
 
 from kivy.uix.textinput import TextInput
-from kivy.uix.dropdown import DropDown
+from suggest import DropSuggestion
 from kivy.uix.button import Button
 from kivy.properties import ListProperty
 from kivy.properties import NumericProperty
@@ -116,6 +116,28 @@ class Element(ElementBehavior, CoreInput):
             self.raw_text = raw_text[:slice_to] + raw_text[slice_to + cut_len:]
             print(self.raw_text)
 
+    def integrate(self):
+        """Initialization steps that must occur after element is in widget tree.
+
+        If you have initialization steps that require the element to know its
+        location in the widget tree, override this function in that specific
+        element subclass.
+        
+        The most common usage of this will be to gain access to the self.parent
+        attribute provided by Kivy once an element has been added to the tree.
+        
+        For example, in the Character element, we want the element to know
+        where a list of possible suggestions can be found. Rather than have
+        each object hold its own list that we have to update, these lists are
+        held in the Screenplay itself and referenced from each object. However,
+        in the __init__ method for Character, we cannot reference self.parent
+        before the object we are constructing is added to the Screenplay. So,
+        instead, we override Character.integrate, which is called after the
+        Character element is added to use self.parent.parent.characters to
+        point the element to the list of previously entered characters.
+        """
+        pass
+
 
 class SuggestiveElement(Element):
     """A special type of element that provides text completion DropDown.
@@ -127,9 +149,9 @@ class SuggestiveElement(Element):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.drop_down = DropDown()
+        self.drop_down = DropSuggestion()
         self.init_drop_down()
-        self.source = ['Cameron', 'CameraMan', 'Casanova']  # Reassign in subclasses
+        self.source = []  # Reassign in subclasses
 
     def init_drop_down(self):
         dd = self.drop_down
@@ -154,17 +176,13 @@ class SuggestiveElement(Element):
 
     def filtered_options(self):
         options = self.source
-        print(options)
         lower_text = (self.text).lower()
         filtered = []
         for option in options:
             lower_option = option.lower()
-            print(lower_text, lower_text)
             if lower_option.startswith(lower_text):
                 filtered.append(option)
-        print(filtered)
         return filtered
-
 
     def on_select(self, instance, text):
         """Change Element text to selected text."""
@@ -194,7 +212,7 @@ class Action(Element):
 
     def next_element(self):
         scene = self.parent
-        scene.add_element(self, added_element=Dialogue)
+        scene.add_element(self, added_element=SceneHeading)
 
     def tab_to(self):
         pass
@@ -205,9 +223,17 @@ class SceneHeading(SuggestiveElement):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    def integrate(self):
+        screenplay = self.parent.parent
+        self.source = screenplay.locations
+
     def next_element(self):
         self.drop_down.dismiss()
+
+        location = self.raw_text
         scene = self.parent
+        screenplay = scene.parent
+        screenplay.update_locations(new_location=location)
         scene.add_element(self, added_element=Action)
 
     def tab_to(self):
@@ -218,14 +244,20 @@ class Character(SuggestiveElement):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # print('Character object is', self)
-        # screenplay = self.parent.parent
-        # self.source = screenplay.charcters
+
+    def integrate(self):
+        """Initialization for after Character is added to the widget tree."""
+        screenplay = self.parent.parent
+        self.source = screenplay.characters
 
     def next_element(self):
-        scene = self.parent
-        scene.add_element(self, added_element=Dialogue)
         self.drop_down.dismiss()
+        character = self.raw_text
+        scene = self.parent
+        screenplay = scene.parent
+        screenplay.update_characters(new_character=character)
+
+        scene.add_element(self, added_element=Dialogue)
 
     def tab_to(self):
         pass
