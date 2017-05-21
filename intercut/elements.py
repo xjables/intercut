@@ -19,12 +19,14 @@ Parenthetical:
 import textwrap
 
 from kivy.uix.textinput import TextInput
-from kivy.properties import StringProperty
+from suggest import DropSuggestion
+from kivy.uix.button import Button
+from kivy.properties import ListProperty
 from kivy.properties import NumericProperty
 from kivy.lang import Builder
 
 from elementbehavior import ElementBehavior
-from textinput import CoreInput
+from coreinput import CoreInput
 from tools.stringmanip import RawText
 import time
 
@@ -114,65 +116,147 @@ class Element(ElementBehavior, CoreInput):
             self.raw_text = raw_text[:slice_to] + raw_text[slice_to + cut_len:]
             print(self.raw_text)
 
+    def integrate(self):
+        """Initialization steps that must occur after element is in widget tree.
+
+        If you have initialization steps that require the element to know its
+        location in the widget tree, override this function in that specific
+        element subclass.
+        
+        The most common usage of this will be to gain access to the self.parent
+        attribute provided by Kivy once an element has been added to the tree.
+        
+        For example, in the Character element, we want the element to know
+        where a list of possible suggestions can be found. Rather than have
+        each object hold its own list that we have to update, these lists are
+        held in the Screenplay itself and referenced from each object. However,
+        in the __init__ method for Character, we cannot reference self.parent
+        before the object we are constructing is added to the Screenplay. So,
+        instead, we override Character.integrate, which is called after the
+        Character element is added to use self.parent.parent.characters to
+        point the element to the list of previously entered characters.
+        """
+        pass
+
+
+class SuggestiveElement(Element):
+    """A special type of element that provides text completion DropDown.
+    
+    This class is designed for Character and SceneHeading elements with the
+    intent that they will provide a DropDown list of already established
+    characters and locations as the user types.
+    """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.drop_down = DropSuggestion()
+        self.init_drop_down()
+        self.source = []  # Reassign in subclasses
+
+    def init_drop_down(self):
+        dd = self.drop_down
+        dd.bind(on_select=self.on_select)
+
+    def update_options(self):
+        """When drop_source changes, update DropDown options.
+        
+        Args:
+            instance: 
+                Catches another instance of self passed by the event handler.
+            suggestions: 
+                The actual list of established characters/locations
+        """
+        suggestions = self.filtered_options()
+        dd = self.drop_down
+        dd.clear_widgets()
+        for suggestion in suggestions:
+            button = Button(text=suggestion, size_hint_y=None, height=30)
+            button.bind(on_release=lambda btn: dd.select(btn.text))
+            dd.add_widget(button)
+
+    def filtered_options(self):
+        options = self.source
+        lower_text = (self.text).lower()
+        filtered = []
+        for option in options:
+            lower_option = option.lower()
+            if lower_option.startswith(lower_text):
+                filtered.append(option)
+        return filtered
+
+    def on_select(self, instance, text):
+        """Change Element text to selected text."""
+        self.text = ''
+        self.insert_text(substring=text, from_undo=False)
+
+    def on_text(self, instance, value):
+        text = self.text
+        if text:
+            self.update_options()
+            self.drop_down.open(self)
+        else:
+            self.drop_down.dismiss()
+
+    def insert_text(self, substring, from_undo=False):
+        raw_text = self.raw_text
+        slice_to = self.cursor_index()
+        self.raw_text = raw_text[:slice_to] + substring + raw_text[slice_to:]
+        insert = substring.upper()
+        super().insert_text(insert, from_undo=from_undo)
+
 
 class Action(Element):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def insert_text(self, substring, from_undo=False):
-        raw_text = self.raw_text
-        slice_to = self.cursor_index()
-        self.raw_text = raw_text[:slice_to] + substring + raw_text[slice_to:]
-        print(self.raw_text)
-        super().insert_text(substring, from_undo=from_undo)
-
     def next_element(self):
         scene = self.parent
-        scene.add_element(self, added_element=Dialogue)
+        scene.add_element(self, added_element=SceneHeading)
 
     def tab_to(self):
         pass
 
 
-class SceneHeading(Element):
+class SceneHeading(SuggestiveElement):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def insert_text(self, substring, from_undo=False):
-        """Capitalize scene heading."""
-        raw_text = self.raw_text
-        slice_to = self.cursor_index()
-        self.raw_text = raw_text[:slice_to] + substring + raw_text[slice_to:]
-        print(self.raw_text)
-        insert = substring.upper()
-        super().insert_text(insert, from_undo=from_undo)
+    def integrate(self):
+        screenplay = self.parent.parent
+        self.source = screenplay.locations
 
     def next_element(self):
+        self.drop_down.dismiss()
+
+        location = self.raw_text
         scene = self.parent
+        screenplay = scene.parent
+        screenplay.update_locations(new_location=location)
         scene.add_element(self, added_element=Action)
 
     def tab_to(self):
         pass
 
 
-class Character(Element):
+class Character(SuggestiveElement):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def insert_text(self, substring, from_undo=False):
-        """Capitalize scene heading."""
-        raw_text = self.raw_text
-        slice_to = self.cursor_index()
-        self.raw_text = raw_text[:slice_to] + substring + raw_text[slice_to:]
-        print(self.raw_text)
-        insert = substring.upper()
-        super().insert_text(insert, from_undo=from_undo)
+    def integrate(self):
+        """Initialization for after Character is added to the widget tree."""
+        screenplay = self.parent.parent
+        self.source = screenplay.characters
 
     def next_element(self):
+        self.drop_down.dismiss()
+        character = self.raw_text
         scene = self.parent
+        screenplay = scene.parent
+        screenplay.update_characters(new_character=character)
+
         scene.add_element(self, added_element=Dialogue)
 
     def tab_to(self):

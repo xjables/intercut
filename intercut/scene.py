@@ -54,6 +54,11 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         # Adding the widget at source_element's location adds it in place
         self.add_widget(element, index=source_element.element_index)
 
+        # Some element initialization steps cannot occur until the element knows
+        # its place in the widget tree. If you need some of these steps,
+        # override Element.integrate
+        element.integrate()
+
         element.focus = True
         self.parent.parent.scroll_to(element)
 
@@ -81,8 +86,6 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         self.align_scene_indices()
         f_element = self.get_element_by_index(new_index)
         f_element.focus = True
-
-
 
     def split_scene(self):
         """Split a scene at a particular element.

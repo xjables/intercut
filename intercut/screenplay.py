@@ -9,6 +9,7 @@ from kivy.uix.behaviors.compoundselection import CompoundSelectionBehavior
 from kivy.lang import Builder
 
 from scene import Scene
+from elements import Character, SceneHeading
 
 Builder.load_file(r'screenplay.kv')
 
@@ -30,6 +31,8 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
     """
 
     def __init__(self, **kwargs):
+        self.characters = []
+        self.locations = []
         super().__init__(**kwargs)
 
     def add_scene(self):
@@ -70,3 +73,24 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
         for s_index, scene in enumerate(self.children):
             scene.scene_index = s_index
             scene.align_scene_indices()
+
+    def update_characters(self, new_character):
+        if new_character:
+            character = new_character.strip()
+            lower_character = character.lower()
+            lower_characters = [char.lower() for char in self.characters]
+            if lower_character in lower_characters:
+                return
+            else:
+                self.characters.append(character)
+
+    def update_locations(self, new_location):
+        if new_location:
+            location = new_location.strip()
+            lower_loc = location.lower()
+            lower_locs = [scn.lower() for scn in self.locations]
+            if lower_loc in lower_locs:
+                return
+            else:
+                self.locations.append(location)
+            print(self.locations)
