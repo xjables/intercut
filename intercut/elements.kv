@@ -14,7 +14,7 @@
     on_text: self.raw_contraction()
 
 <SuggestiveElement>:
-    source: ['Cameron', 'Jamison', 'Drew']
+    source: self.parent.parent.characters
 
 <Action>:
     hint_text: '[Action]'
@@ -33,6 +33,7 @@
     padding_x: ['3.5in', 0]
     padding_y: [self.line_height/2, 0]
     wrap_length: 30
+    source: self.parent.parent.characters
     on_text_validate: self.parent.add_element(self, added_element=elements.Dialogue)
 
 <Dialogue>:

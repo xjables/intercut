@@ -82,8 +82,6 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         f_element = self.get_element_by_index(new_index)
         f_element.focus = True
 
-
-
     def split_scene(self):
         """Split a scene at a particular element.
         

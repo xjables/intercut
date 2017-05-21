@@ -125,15 +125,17 @@ class SuggestiveElement(Element):
     characters and locations as the user types.
     """
 
-    source = ListProperty()
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.drop_down = DropDown()
+        self.init_drop_down()
+        self.source = ['Cameron', 'CameraMan', 'Casanova']  # Reassign in subclasses
+
+    def init_drop_down(self):
         dd = self.drop_down
         dd.bind(on_select=self.on_select)
 
-    def on_source(self, instance, suggestions):
+    def update_options(self):
         """When drop_source changes, update DropDown options.
         
         Args:
@@ -142,14 +144,27 @@ class SuggestiveElement(Element):
             suggestions: 
                 The actual list of established characters/locations
         """
-        print('on_source')
+        suggestions = self.filtered_options()
         dd = self.drop_down
         dd.clear_widgets()
         for suggestion in suggestions:
-            print('line_height', self.line_height)
             button = Button(text=suggestion, size_hint_y=None, height=30)
             button.bind(on_release=lambda btn: dd.select(btn.text))
             dd.add_widget(button)
+
+    def filtered_options(self):
+        options = self.source
+        print(options)
+        lower_text = (self.text).lower()
+        filtered = []
+        for option in options:
+            lower_option = option.lower()
+            print(lower_text, lower_text)
+            if lower_option.startswith(lower_text):
+                filtered.append(option)
+        print(filtered)
+        return filtered
+
 
     def on_select(self, instance, text):
         """Change Element text to selected text."""
@@ -158,10 +173,11 @@ class SuggestiveElement(Element):
 
     def on_text(self, instance, value):
         text = self.text
-        if not text:
-            self.drop_down.dismiss()
-        else:
+        if text:
+            self.update_options()
             self.drop_down.open(self)
+        else:
+            self.drop_down.dismiss()
 
     def insert_text(self, substring, from_undo=False):
         raw_text = self.raw_text
@@ -190,9 +206,9 @@ class SceneHeading(SuggestiveElement):
         super().__init__(**kwargs)
 
     def next_element(self):
+        self.drop_down.dismiss()
         scene = self.parent
         scene.add_element(self, added_element=Action)
-        self.drop_down.dismiss()
 
     def tab_to(self):
         pass
@@ -202,6 +218,9 @@ class Character(SuggestiveElement):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # print('Character object is', self)
+        # screenplay = self.parent.parent
+        # self.source = screenplay.charcters
 
     def next_element(self):
         scene = self.parent
