@@ -49,7 +49,7 @@ class Element(ElementBehavior, CoreInput):
         self.raw_text = ''
 
         self.register_shortcut(  # enter
-            13, callback=self.next_element)
+            13, callback=self.on_enter)
         self.register_shortcut(  # backspace
             8, callback=self.on_backspace, kill=False)
         self.register_shortcut(  # tab
@@ -68,6 +68,9 @@ class Element(ElementBehavior, CoreInput):
         """
         scene = self.parent
         return scene.scene_index, self.element_index
+
+    def on_enter(self):
+        self.next_element()
 
     def on_backspace(self):
         """Handle special backspace cases.
@@ -152,6 +155,8 @@ class SuggestiveElement(Element):
         self.drop_down = DropSuggestion()
         self.init_drop_down()
         self.source = []  # Reassign in subclasses
+        # TODO: Register up and down arrow shortcuts (38 and 40, respectively)
+        # TODO: To navigate through buttons
 
     def init_drop_down(self):
         dd = self.drop_down
@@ -196,6 +201,13 @@ class SuggestiveElement(Element):
             self.drop_down.open(self)
         else:
             self.drop_down.dismiss()
+
+    def on_enter(self):
+        dd = self.drop_down
+        suggestions = dd.container.children
+        if dd.is_open and suggestions:
+            dd.select(suggestions[-1].text)
+        super().on_enter()
 
     def insert_text(self, substring, from_undo=False):
         raw_text = self.raw_text
