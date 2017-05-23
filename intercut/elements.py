@@ -19,7 +19,7 @@ Parenthetical:
 import textwrap
 
 from kivy.uix.textinput import TextInput
-from suggest import DropSuggestion
+from suggest import DropSuggestion, SuggestionButton
 from kivy.uix.button import Button
 from kivy.properties import ListProperty
 from kivy.properties import NumericProperty
@@ -49,7 +49,7 @@ class Element(ElementBehavior, CoreInput):
         self.raw_text = ''
 
         self.register_shortcut(  # enter
-            13, callback=self.next_element)
+            13, callback=self.on_enter)
         self.register_shortcut(  # backspace
             8, callback=self.on_backspace, kill=False)
         self.register_shortcut(  # tab
@@ -68,6 +68,9 @@ class Element(ElementBehavior, CoreInput):
         """
         scene = self.parent
         return scene.scene_index, self.element_index
+
+    def on_enter(self):
+        self.next_element()
 
     def on_backspace(self):
         """Handle special backspace cases.
@@ -98,7 +101,7 @@ class Element(ElementBehavior, CoreInput):
         return len(self.text)
 
     def raw_contraction(self):
-        # TODO: Rework this a little (it is bount to on_text)
+        # TODO: Rework this a little (it is bound to on_text)
         len_txt = len(self.text)
         len_raw = len(self.raw_text)
         raw_text = self.raw_text
@@ -140,7 +143,7 @@ class Element(ElementBehavior, CoreInput):
 
 
 class SuggestiveElement(Element):
-    """A special type of element that provides text completion DropDown.
+    """A special type of element that provides a text completion DropDown.
     
     This class is designed for Character and SceneHeading elements with the
     intent that they will provide a DropDown list of already established
@@ -153,7 +156,23 @@ class SuggestiveElement(Element):
         self.init_drop_down()
         self.source = []  # Reassign in subclasses
 
+        self.register_shortcut(
+            273, self.on_arrow_up
+        )
+        self.register_shortcut(
+            274, self.on_arrow_down
+        )
+        # TODO: Register up and down arrow shortcuts (38 and 40, respectively)
+        # TODO: To navigate through buttons
+
+    def on_arrow_down(self):
+        self.drop_down.move_highlight(increment=1)
+
+    def on_arrow_up(self):
+        self.drop_down.move_highlight(increment=-1)
+
     def init_drop_down(self):
+        """Handle binding for drop down menu."""
         dd = self.drop_down
         dd.bind(on_select=self.on_select)
 
@@ -170,11 +189,12 @@ class SuggestiveElement(Element):
         dd = self.drop_down
         dd.clear_widgets()
         for suggestion in suggestions:
-            button = Button(text=suggestion, size_hint_y=None, height=30)
+            button = SuggestionButton(text=suggestion)
             button.bind(on_release=lambda btn: dd.select(btn.text))
             dd.add_widget(button)
 
     def filtered_options(self):
+        """Filter the list of possible options based on entered text."""
         options = self.source
         lower_text = (self.text).lower()
         filtered = []
@@ -188,14 +208,27 @@ class SuggestiveElement(Element):
         """Change Element text to selected text."""
         self.text = ''
         self.insert_text(substring=text, from_undo=False)
+        super().on_enter()
 
     def on_text(self, instance, value):
+        """Live update the drop down during typing."""
         text = self.text
         if text:
             self.update_options()
             self.drop_down.open(self)
+            self.drop_down.set_highlight()
         else:
             self.drop_down.dismiss()
+
+    def on_enter(self):
+        """Enter the top level option into the element."""
+        dd = self.drop_down
+        suggestions = dd.container.children
+        if dd.is_open and suggestions:
+            text = self.drop_down.get_selection_text()
+            dd.select(text)
+        else:
+            super().on_enter()
 
     def insert_text(self, substring, from_undo=False):
         raw_text = self.raw_text
