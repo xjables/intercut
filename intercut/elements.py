@@ -15,20 +15,14 @@ Dialogue:
 Parenthetical:
     This is embedded in dialogue to indicate a non-verbal cue to the actors.
 """
+from functools import partial
 
-import textwrap
-
-from kivy.uix.textinput import TextInput
 from suggest import DropSuggestion, SuggestionButton
-from kivy.uix.button import Button
-from kivy.properties import ListProperty
 from kivy.properties import NumericProperty
 from kivy.lang import Builder
 
 from elementbehavior import ElementBehavior
 from coreinput import CoreInput
-from tools.stringmanip import RawText
-import time
 
 Builder.load_file(r'elements.kv')
 
@@ -59,6 +53,22 @@ class Element(ElementBehavior, CoreInput):
             8, modifier='ctrl', callback=self.delete_word_left)
         self.register_shortcut(  # 'ctrl' + delete
             127, modifier='ctrl', callback=self.delete_word_right)
+
+        # Transformation shortcuts
+        self.register_shortcut(  # 'alt' + a
+            97, modifier='alt', callback=partial(self.morph, new_type=Action))
+        self.register_shortcut(  # 'alt' + s
+            115, modifier='alt', callback=partial(self.morph, new_type=SceneHeading))
+        self.register_shortcut(  # 'alt' + c
+            99, modifier='alt', callback=partial(self.morph, new_type=Character))
+        self.register_shortcut(  # 'alt' + d
+            100, modifier='alt', callback=partial(self.morph, new_type=Dialogue))
+
+    def morph(self, new_type):
+        print('morph to', new_type)
+        scene = self.parent
+        new_element = new_type()
+        scene.transform_element(source_element=self, new_element=new_element)
 
     def get_location(self):
         """Retrieve the coordinates of this element.
@@ -118,6 +128,18 @@ class Element(ElementBehavior, CoreInput):
                 slice_to = len_txt
             self.raw_text = raw_text[:slice_to] + raw_text[slice_to + cut_len:]
             print(self.raw_text)
+
+    def insert_text(self, substring, from_undo=False):
+        """Capitalize scene heading."""
+        raw_text = self.raw_text
+        slice_to = self.cursor_index()
+        self.raw_text = raw_text[:slice_to] + substring + raw_text[
+                                                          slice_to:]
+        print(self.raw_text)
+        super().insert_text(substring, from_undo=from_undo)
+
+    def core_insert(self, substring, from_undo=False):
+        super().insert_text(substring=substring, from_undo=from_undo)
 
     def integrate(self):
         """Initialization steps that must occur after element is in widget tree.
@@ -235,7 +257,8 @@ class SuggestiveElement(Element):
         slice_to = self.cursor_index()
         self.raw_text = raw_text[:slice_to] + substring + raw_text[slice_to:]
         insert = substring.upper()
-        super().insert_text(insert, from_undo=from_undo)
+        super().core_insert(substring=insert, from_undo=from_undo)
+        return
 
 
 class Action(Element):
@@ -245,7 +268,8 @@ class Action(Element):
 
     def next_element(self):
         scene = self.parent
-        scene.add_element(self, added_element=SceneHeading)
+        added_element = SceneHeading()
+        scene.add_element(self, added_element=added_element)
 
     def tab_to(self):
         pass
@@ -266,8 +290,10 @@ class SceneHeading(SuggestiveElement):
         location = self.raw_text
         scene = self.parent
         screenplay = scene.parent
+        added_element = Action()
+
         screenplay.update_locations(new_location=location)
-        scene.add_element(self, added_element=Action)
+        scene.add_element(self, added_element=added_element)
 
     def tab_to(self):
         pass
@@ -285,12 +311,14 @@ class Character(SuggestiveElement):
 
     def next_element(self):
         self.drop_down.dismiss()
+
         character = self.raw_text
         scene = self.parent
         screenplay = scene.parent
-        screenplay.update_characters(new_character=character)
+        added_element = Dialogue()
 
-        scene.add_element(self, added_element=Dialogue)
+        screenplay.update_characters(new_character=character)
+        scene.add_element(self, added_element=added_element)
 
     def tab_to(self):
         pass
@@ -301,17 +329,10 @@ class Dialogue(Element):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def insert_text(self, substring, from_undo=False):
-        """Capitalize scene heading."""
-        raw_text = self.raw_text
-        slice_to = self.cursor_index()
-        self.raw_text = raw_text[:slice_to] + substring + raw_text[slice_to:]
-        print(self.raw_text)
-        super().insert_text(substring, from_undo=from_undo)
-
     def next_element(self):
         scene = self.parent
-        scene.add_element(self, added_element=Character)
+        added_element = Character()
+        scene.add_element(self, added_element=added_element)
 
     def tab_to(self):
         pass

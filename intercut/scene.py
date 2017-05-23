@@ -8,7 +8,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.behaviors.compoundselection import CompoundSelectionBehavior
 from kivy.lang import Builder
 
-from elements import Action, SceneHeading, Character, Dialogue
+from elements import SuggestiveElement
 
 Builder.load_file(r'scene.kv')
 
@@ -41,7 +41,7 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         for e_index, element in enumerate(self.children):
             element.element_index = e_index
 
-    def add_element(self, source_element, added_element=Action):
+    def add_element(self, source_element, added_element):
         """Add an element to scene.
 
         Note: added_element is a class, not an instance of the class.
@@ -50,22 +50,35 @@ class Scene(CompoundSelectionBehavior, GridLayout):
             source_element: The element requesting that an element be added.
             added_element: The element object to be inserted.
         """
-        element = added_element()
         # Adding the widget at source_element's location adds it in place
-        self.add_widget(element, index=source_element.element_index)
+        self.add_widget(added_element, index=source_element.element_index)
 
         # Some element initialization steps cannot occur until the element knows
         # its place in the widget tree. If you need some of these steps,
         # override Element.integrate
-        element.integrate()
+        added_element.integrate()
 
-        element.focus = True
-        self.parent.parent.scroll_to(element)
+        added_element.focus = True
+        self.parent.parent.scroll_to(added_element)
 
-    # TODO: Now that raw_text is implemented, create a transform_element method
-    # TODO: transforms one element into another by creating a new element,
-    # TODO: copies over relevant information and deletes the old one. This will
-    # TODO: involve add_element->"do the copy"->remove_element
+    def transform_element(self, source_element, new_element):
+        self.add_element(source_element, added_element=new_element)
+
+        raw_source = source_element.raw_text
+
+        if isinstance(new_element, SuggestiveElement):
+            new_element.drop_down.dismiss()
+            new_element.text = raw_source.upper()
+        else:
+            new_element.text = raw_source
+        new_element.raw_text = raw_source
+
+        print('diplayed:', new_element.text)
+        print('raw:', new_element.raw_text)
+
+        self.remove_element(source_element)
+        new_element.focus = True
+        self.parent.parent.scroll_to(new_element)
 
     def add_widget(self, widget, **kwargs):
         """Helper for Widget.add_widget() that updates element indices after
@@ -82,6 +95,10 @@ class Scene(CompoundSelectionBehavior, GridLayout):
 
         """
         new_index = element.element_index
+
+        if isinstance(element, SuggestiveElement):
+            element.drop_down.dismiss()
+
         super().remove_widget(element, **kwargs)
         self.align_scene_indices()
         f_element = self.get_element_by_index(new_index)
