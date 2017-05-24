@@ -65,7 +65,11 @@ class Element(ElementBehavior, CoreInput):
             100, modifier='alt', callback=partial(self.morph, new_type=Dialogue))
 
     def morph(self, new_type):
-        print('morph to', new_type)
+        """Change an element into another element.
+        
+        Args:
+            new_type: The class to into which the element will change.
+        """
         scene = self.parent
         new_element = new_type()
         scene.transform_element(source_element=self, new_element=new_element)
@@ -121,7 +125,7 @@ class Element(ElementBehavior, CoreInput):
             slice_to = 0
             try:
                 for index, char in enumerate(self.raw_text):
-                    if char.upper() != self.text[index]:
+                    if char.upper() != self.text[index].upper():
                         slice_to = index
                         break
             except IndexError:
