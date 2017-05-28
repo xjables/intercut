@@ -74,13 +74,19 @@ class Scene(CompoundSelectionBehavior, GridLayout):
             # TODO: Move the cursor to the left.
         else:
             new_element.text = raw_source
+
         new_element.raw_text = raw_source
 
-        print('diplayed:', new_element.text)
+        print('displayed:', new_element.text)
         print('raw:', new_element.raw_text)
 
         self.remove_element(source_element)
         new_element.focus = True
+        if isinstance(new_element, Parenthetical):
+            new_element.do_cursor_movement('cursor_left')
+            ind = new_element.cursor_index()
+            cur = new_element.get_cursor_from_index(ind - 1)
+            new_element.cursor = cur
         self.parent.parent.scroll_to(new_element)
 
     def strip_parenthesis(self, string):

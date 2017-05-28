@@ -109,16 +109,22 @@ class ElementBehavior(object):
 
         if is_special_key:
             key_callback, kill = self.special_keys[str(key)]
-            key_callback()
-            if kill:
-                return kill
+            callback_kill = key_callback()
+            print(keycode)
+            print(key_callback, 'returns', callback_kill)
+            print('kill:', kill)
+            if kill or callback_kill:
+                return True
 
         if is_element_shortcut:
             # Get callback from bindings and run it.
             shortcut_callback, kill = self.bindings[mod][str(key)]
-            shortcut_callback()
-            if kill:
-                return kill
+            # If the callback returns True, catch it and kill the signal. This
+            # gives the callback the power to prevent TextInput from getting
+            # the key input. For example, this is used in Element.Parenthetical
+            callback_kill = shortcut_callback()
+            if kill or callback_kill:
+                return True
         else:
             # If no shortcut matches, pass control on to standard TextInput
             # to try to match shortcuts.

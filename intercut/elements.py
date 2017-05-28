@@ -77,6 +77,7 @@ class Element(ElementBehavior, CoreInput):
         scene = self.parent
         new_element = new_type()
         scene.transform_element(source_element=self, new_element=new_element)
+        print(new_element.cursor_index())
 
     def get_location(self):
         """Retrieve the coordinates of this element.
@@ -113,6 +114,7 @@ class Element(ElementBehavior, CoreInput):
             #     for char in range(len(leftover_text)):
             #         preceding_element.do_cursor_movement('cursor_left')
             #         print(preceding_element.cursor)
+        print('<Element>.on_backspace')
 
     def get_length(self):
         """Return the length of the text string for an element."""
@@ -351,14 +353,25 @@ class Parenthetical(Element):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-
     def insert_text(self, substring, from_undo=False):
-        text_len = len(self.text)
         c_index = self.cursor_index()
+        text_len = len(self.text)
         print('text length:', text_len)
         print('cursor index', c_index)
         if 0 < c_index < text_len:
             super().insert_text(substring=substring, from_undo=from_undo)
+        else:
+            return True
+
+    def on_backspace(self):
+        c_index = self.cursor_index()
+        text_len = len(self.text)
+        print('text length:', text_len)
+        print('cursor index', c_index)
+        if 0 < c_index < text_len:
+            super().on_backspace()
+        else:
+            return True
 
     def next_element(self):
         scene = self.parent
