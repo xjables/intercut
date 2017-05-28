@@ -397,13 +397,13 @@ class Parenthetical(Element):
 
     def insert_text(self, substring, from_undo=False):
         """Capitalize scene heading."""
-        print('<Parenthetical>.insert_text')
         raw_text = self.raw_text
         # The -1 offsets the fact that an opening parenthesis leads
         slice_to = self.cursor_index() - 1
         self.raw_text = raw_text[:slice_to] + substring + raw_text[
                                                           slice_to:]
         print(self.raw_text)
+        # Skip over Element.insert_text
         super(Element, self).insert_text(substring, from_undo=from_undo)
 
     def cut_text_parenthesis(self):

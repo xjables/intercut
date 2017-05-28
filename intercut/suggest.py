@@ -35,7 +35,7 @@ class DropSuggestion(DropDown):
                     self.set_highlight(options[index - increment])
                     return
                 except IndexError:
-                    self.set_highlight(button=option)
+                    self.set_highlight(options[0])
                     return
 
     def set_highlight(self, button=None):
