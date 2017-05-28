@@ -110,9 +110,6 @@ class ElementBehavior(object):
         if is_special_key:
             key_callback, kill = self.special_keys[str(key)]
             callback_kill = key_callback()
-            print(keycode)
-            print(key_callback, 'returns', callback_kill)
-            print('kill:', kill)
             if kill or callback_kill:
                 return True
 
