@@ -63,6 +63,10 @@ class Element(ElementBehavior, CoreInput):
             99, modifier='alt', callback=partial(self.morph, new_type=Character))
         self.register_shortcut(  # 'alt' + d
             100, modifier='alt', callback=partial(self.morph, new_type=Dialogue))
+        self.register_shortcut(  # 'alt' + p
+            112, modifier='alt', callback=partial(self.morph, new_type=Parenthetical)
+        )
+
 
     def morph(self, new_type):
         """Change an element into another element.
@@ -336,6 +340,29 @@ class Dialogue(Element):
     def next_element(self):
         scene = self.parent
         added_element = Character()
+        scene.add_element(self, added_element=added_element)
+
+    def tab_to(self):
+        pass
+
+
+class Parenthetical(Element):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+    def insert_text(self, substring, from_undo=False):
+        text_len = len(self.text)
+        c_index = self.cursor_index()
+        print('text length:', text_len)
+        print('cursor index', c_index)
+        if 0 < c_index < text_len:
+            super().insert_text(substring=substring, from_undo=from_undo)
+
+    def next_element(self):
+        scene = self.parent
+        added_element = Dialogue()
         scene.add_element(self, added_element=added_element)
 
     def tab_to(self):

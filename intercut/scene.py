@@ -8,7 +8,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.behaviors.compoundselection import CompoundSelectionBehavior
 from kivy.lang import Builder
 
-from elements import SuggestiveElement
+from elements import SuggestiveElement, Parenthetical
 
 Builder.load_file(r'scene.kv')
 
@@ -69,6 +69,9 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         if isinstance(new_element, SuggestiveElement):
             new_element.drop_down.dismiss()
             new_element.text = raw_source.upper()
+        elif isinstance(new_element, Parenthetical):
+            new_element.text = self.add_parentesis(raw_source)
+            # TODO: Move the cursor to the left.
         else:
             new_element.text = raw_source
         new_element.raw_text = raw_source
@@ -79,6 +82,16 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         self.remove_element(source_element)
         new_element.focus = True
         self.parent.parent.scroll_to(new_element)
+
+    def strip_parenthesis(self, string):
+        if string.startswith('('):
+            string = string[1:]
+        if string.endswith(')'):
+            string = string[:-1]
+        return string
+
+    def add_parentesis(self, string):
+        return '(' + string + ')'
 
     def add_widget(self, widget, **kwargs):
         """Helper for Widget.add_widget() that updates element indices after
