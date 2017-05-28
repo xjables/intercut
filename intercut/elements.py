@@ -42,6 +42,7 @@ class Element(ElementBehavior, CoreInput):
         self.element_index = 0
         self.raw_text = ''
 
+        # Register Special Keys
         self.register_shortcut(  # enter
             13, callback=self.on_enter)
         self.register_shortcut(  # backspace
@@ -63,6 +64,10 @@ class Element(ElementBehavior, CoreInput):
             99, modifier='alt', callback=partial(self.morph, new_type=Character))
         self.register_shortcut(  # 'alt' + d
             100, modifier='alt', callback=partial(self.morph, new_type=Dialogue))
+        self.register_shortcut(  # 'alt' + p
+            112, modifier='alt', callback=partial(self.morph, new_type=Parenthetical)
+        )
+
 
     def morph(self, new_type):
         """Change an element into another element.
@@ -73,6 +78,7 @@ class Element(ElementBehavior, CoreInput):
         scene = self.parent
         new_element = new_type()
         scene.transform_element(source_element=self, new_element=new_element)
+        print(new_element.cursor_index())
 
     def get_location(self):
         """Retrieve the coordinates of this element.
@@ -94,7 +100,6 @@ class Element(ElementBehavior, CoreInput):
         into the format of the preceding element.
         """
         slice_to = self.cursor_index()
-        focus_index = self.element_index
         scene = self.parent
 
         if self.text[:slice_to] == '':
@@ -116,7 +121,12 @@ class Element(ElementBehavior, CoreInput):
 
     def raw_contraction(self):
         # TODO: Rework this a little (it is bound to on_text)
-        len_txt = len(self.text)
+        if isinstance(self, Parenthetical):
+            text = self.cut_text_parenthesis()
+        else:
+            text = self.text
+
+        len_txt = len(text)
         len_raw = len(self.raw_text)
         raw_text = self.raw_text
 
@@ -125,7 +135,7 @@ class Element(ElementBehavior, CoreInput):
             slice_to = 0
             try:
                 for index, char in enumerate(self.raw_text):
-                    if char.upper() != self.text[index].upper():
+                    if char.upper() != text[index].upper():
                         slice_to = index
                         break
             except IndexError:
@@ -337,6 +347,67 @@ class Dialogue(Element):
         scene = self.parent
         added_element = Character()
         scene.add_element(self, added_element=added_element)
+
+    def tab_to(self):
+        pass
+
+
+class Parenthetical(Element):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.register_shortcut(  # del
+            127, callback=self.on_delete, kill=False)
+
+    def insert_text(self, substring, from_undo=False):
+        c_index = self.cursor_index()
+        text_len = len(self.text)
+        if 0 < c_index < text_len:
+            super().insert_text(substring=substring, from_undo=from_undo)
+        else:
+            return True
+
+    def on_delete(self):
+        c_index = self.cursor_index()
+        text_len = len(self.text)
+        if 0 < c_index < (text_len - 1):
+            return False
+        else:
+            # prevent 'del' from being passed to TextInput
+            return True
+
+    def on_backspace(self):
+        c_index = self.cursor_index()
+        print(c_index)
+        text_len = len(self.text)
+        if text_len == 2:
+            scene = self.parent
+            scene.remove_element(self)
+
+        if 1 < c_index < text_len:
+            super().on_backspace()
+        else:
+            return True
+
+    def next_element(self):
+        scene = self.parent
+        added_element = Dialogue()
+        scene.add_element(self, added_element=added_element)
+
+    def insert_text(self, substring, from_undo=False):
+        """Capitalize scene heading."""
+        raw_text = self.raw_text
+        # The -1 offsets the fact that an opening parenthesis leads
+        slice_to = self.cursor_index() - 1
+        self.raw_text = raw_text[:slice_to] + substring + raw_text[
+                                                          slice_to:]
+        print(self.raw_text)
+        # Skip over Element.insert_text
+        super(Element, self).insert_text(substring, from_undo=from_undo)
+
+    def cut_text_parenthesis(self):
+        return self.text[1: -1]
 
     def tab_to(self):
         pass
