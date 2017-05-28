@@ -368,7 +368,7 @@ class Parenthetical(Element):
         text_len = len(self.text)
         print('text length:', text_len)
         print('cursor index', c_index)
-        if 0 < c_index < text_len:
+        if 1 < c_index < text_len:
             super().on_backspace()
         else:
             return True
