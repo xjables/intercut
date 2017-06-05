@@ -49,6 +49,10 @@ class Element(ElementBehavior, CoreInput):
             8, callback=self.on_backspace, kill=False)
         self.register_shortcut(  # tab
              9, callback=self.tab_to)
+        self.register_shortcut(  # down
+            274, callback=self.press_down)
+        self.register_shortcut(  # up
+            273, callback=self.press_up)
 
         self.register_shortcut(  # 'ctrl' + backspace
             8, modifier='ctrl', callback=self.delete_word_left)
@@ -91,6 +95,33 @@ class Element(ElementBehavior, CoreInput):
 
     def on_enter(self):
         self.next_element()
+
+    def press_down(self):
+        c_row = self.cursor[1]
+        rows = self.get_lines()
+        scene = self.parent
+        elem_index = self.element_index
+
+        if rows == c_row + 1:
+            # if element is at the bottom of the SP
+            if elem_index == 0:
+                return
+            else:
+                to_focus = scene.children[elem_index - 1]
+                to_focus.focus = True
+
+    def press_up(self):
+        c_row = self.cursor[1]
+        rows = self.get_lines()
+        scene = self.parent
+        elem_index = self.element_index
+
+        if rows == c_row + 1:
+            try:
+                to_focus = scene.children[elem_index + 1]
+                to_focus.focus = True
+            except IndexError:
+                pass
 
     def on_backspace(self):
         """Handle special backspace cases.

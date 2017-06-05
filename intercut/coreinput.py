@@ -184,3 +184,7 @@ class CoreInput(TextInput):
                 yield text[oldindex:index + 1]
             oldindex = index + 1
         yield text[oldindex:]
+
+    def get_lines(self):
+        """Return the number of lines of the element."""
+        return len(self._lines)
