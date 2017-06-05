@@ -233,10 +233,16 @@ class SuggestiveElement(Element):
         # TODO: To navigate through buttons
 
     def on_arrow_down(self):
-        self.drop_down.move_highlight(increment=1)
+        if self.drop_down.is_open:
+            self.drop_down.move_highlight(increment=1)
+        else:
+            self.press_down()
 
     def on_arrow_up(self):
-        self.drop_down.move_highlight(increment=-1)
+        if self.drop_down.is_open:
+            self.drop_down.move_highlight(increment=-1)
+        else:
+            self.press_up()
 
     def init_drop_down(self):
         """Handle binding for drop down menu."""
