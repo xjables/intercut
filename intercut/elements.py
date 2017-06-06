@@ -49,6 +49,10 @@ class Element(ElementBehavior, CoreInput):
             8, callback=self.on_backspace, kill=False)
         self.register_shortcut(  # tab
              9, callback=self.tab_to)
+        self.register_shortcut(  # down
+            274, callback=self.press_down, kill=False)
+        self.register_shortcut(  # up
+            273, callback=self.press_up, kill=False)
 
         self.register_shortcut(  # 'ctrl' + backspace
             8, modifier='ctrl', callback=self.delete_word_left)
@@ -91,6 +95,35 @@ class Element(ElementBehavior, CoreInput):
 
     def on_enter(self):
         self.next_element()
+
+    def press_down(self):
+        c_row = self.cursor[1]
+        rows = self.get_lines()
+        scene = self.parent
+        elem_index = self.element_index
+
+        if rows == c_row + 1:
+            # if element is at the bottom of the Scene
+            if elem_index == 0:
+                return True
+            else:
+                to_focus = scene.children[elem_index - 1]
+                to_focus.focus = True
+                return True
+
+    def press_up(self):
+        c_row = self.cursor[1]
+        scene = self.parent
+        elem_index = self.element_index
+
+        # If we are not at the top line...
+        if not c_row:
+            try:
+                to_focus = scene.children[elem_index + 1]
+                to_focus.focus = True
+                return True
+            except IndexError:
+                return False
 
     def on_backspace(self):
         """Handle special backspace cases.
@@ -202,10 +235,16 @@ class SuggestiveElement(Element):
         # TODO: To navigate through buttons
 
     def on_arrow_down(self):
-        self.drop_down.move_highlight(increment=1)
+        if self.drop_down.is_open:
+            self.drop_down.move_highlight(increment=1)
+        else:
+            self.press_down()
 
     def on_arrow_up(self):
-        self.drop_down.move_highlight(increment=-1)
+        if self.drop_down.is_open:
+            self.drop_down.move_highlight(increment=-1)
+        else:
+            self.press_up()
 
     def init_drop_down(self):
         """Handle binding for drop down menu."""

@@ -71,7 +71,6 @@ class Scene(CompoundSelectionBehavior, GridLayout):
             new_element.text = raw_source.upper()
         elif isinstance(new_element, Parenthetical):
             new_element.text = self.add_parentesis(raw_source)
-            # TODO: Move the cursor to the left.
         else:
             new_element.text = raw_source
 
@@ -84,9 +83,8 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         new_element.focus = True
         if isinstance(new_element, Parenthetical):
             new_element.do_cursor_movement('cursor_left')
-            ind = new_element.cursor_index()
-            cur = new_element.get_cursor_from_index(ind - 1)
-            new_element.cursor = cur
+            # FIXME: The line above doesn't set the initial cursor to the left
+            # FIXME: of the far right parenthesis. Not sure why?
         self.parent.parent.scroll_to(new_element)
 
     def strip_parenthesis(self, string):
