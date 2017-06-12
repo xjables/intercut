@@ -5,6 +5,7 @@ A Screenplay is just a BoxLayout for carrying the actual Element widgets.
 """
 
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.scrollview import ScrollView
 from kivy.uix.behaviors.compoundselection import CompoundSelectionBehavior
 from kivy.lang import Builder
 
@@ -94,3 +95,7 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
             else:
                 self.locations.append(location)
             print(self.locations)
+
+
+class ScrollingScreenplay(ScrollView):
+    pass
