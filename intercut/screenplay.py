@@ -96,6 +96,10 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
                 self.locations.append(location)
             print(self.locations)
 
+    @classmethod
+    def get_width(cls):
+        return cls.width
+
 
 class ScrollingScreenplay(ScrollView):
     pass

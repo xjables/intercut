@@ -1,10 +1,56 @@
-#:include elements.kv
+<ViewManager>:
+    do_default_tab: True
+    default_tab: sp_tab_item
+    tab_pos: 'left_bottom'
+    background_color: [.2, .2, .2, 1]
 
-<Screenplay>:
-    orientation: 'vertical'
-        Scene:
-        Scene:
-        Button:
-            text: "Button"
+    TabbedPanelItem:
+        text: 'Struct View'
+        Label:
+            text: 'Structure View'
+
+    TabbedPanelItem:
+        text: 'Cards'
+        RstDocument:
+            text:
+                '\\n'.join(("Cards", "-----------",
+                "To be completed."))
+
+    TabbedPanelItem:
+        id: sp_tab_item
+        text: 'Screenplay'
+
+        BoxLayout:
+            Label:
+                size_hint_x: None
+                width: 0
+            ScrollingScreenplay:
+            Label:
+                size_hint_x: None
+                width: 0
+
+
+<ScreenplayManager>:
+    do_default_tab: False
+    tab_pos: 'top_left'
+    background_color: [0, 0, 0, 0]
+    tab_width: 200
+
+    TabbedPanelItem:
+        text: 'Surface'
+        ViewManager:
+
+    TabbedPanelItem:
+        text: 'Title'
+        ViewManager:
+
+
+<TabbedContent>:
+    canvas.before:
+        Color:
+            rgba: 75,0,130,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
 
         
