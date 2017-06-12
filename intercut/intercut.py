@@ -20,25 +20,14 @@ class MyTabbedPanel(TabbedPanel):
 
 class ViewManager(MyTabbedPanel):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        # We are binding to Window.on_resize instead of using self.bind(size=self.sp_border_width) because the latter
-        # does not catch maximize and minimize events for some reason, even though the content is resized.
-        Window.bind(on_resize=self.sp_border_width)
-
-    def sp_border_width(self, window, width, height):
+    def sp_border_width(self, border_w):
         """Modify the Screenplay borders such that they only appear if the Screenplay doesn't fill the screen.
 
         Args:
-            window: Instance of the application window
-            width: Width of the window
-            height: Height of the window
+            border_w:
+                Width to be applied to each screenplay border.
         """
-        cont_w = self.content.width
-        sp_w = inch(8.5)
-        border_w = cont_w - sp_w
 
-        # Find labels in default tab (Screenplay) and resize them
         for item in self.default_tab_content.children[:]:
             if isinstance(item, Label):
                 if border_w > 0:
@@ -48,7 +37,34 @@ class ViewManager(MyTabbedPanel):
 
 
 class ScreenplayManager(MyTabbedPanel):
-    pass
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # We are binding to Window.on_resize instead of using self.bind(size=self.sp_border_width) because the latter
+        # does not catch maximize and minimize events for some reason, even though the content is resized.
+        Window.bind(on_resize=self.adjust_sp_widths)
+
+    def adjust_sp_widths(self, window, width, height):
+        """Adjust the Screenplay borders for ALL open screenplays.
+
+        The current window is used to calculate borders for all screenplays because when a screenplay tab is not open,
+        it's content size is not adjusted with window, so we cannot use its values for calculation.
+
+        Args:
+            window: Instance of the application Window.
+            width: Width of the window.
+            height: Height of the window.
+        """
+        current_view = self.current_tab.content
+        cont_w = current_view.content.width
+        sp_w = inch(8.5)
+        border_w = cont_w - sp_w
+
+        screenplay_tabs = self.tab_list
+
+        for tab in screenplay_tabs:
+            view_manager = tab.content
+            view_manager.sp_border_width(border_w=border_w)
 
 
 class InterXut(App):
