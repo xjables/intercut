@@ -21,14 +21,17 @@
         SceneHeading:
             size_hint_y: None
             text_size: self.width, None
-        Character:
+        Action:
+            text: str(root.width)
+
 
 <ScrollingScreenplay>:
-    bar_width: 20
+    bar_width: 15
     bar_color: [.427, .031, .686, 1]
     bar_inactive_color: self.bar_color[:3] + [.2]
     scroll_type: ['bars']
     # scroll_timeout being 0 prevents touch scrolling and sends touch controls
     # directly to the children
     scroll_timeout: 0
+
     Screenplay:

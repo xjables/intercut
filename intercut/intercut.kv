@@ -1,5 +1,6 @@
 <ViewManager>:
-    do_default_tab: False
+    do_default_tab: True
+    default_tab: sp_tab_item
     tab_pos: 'left_bottom'
     background_color: [.2, .2, .2, 1]
 
@@ -9,10 +10,6 @@
             text: 'Structure View'
 
     TabbedPanelItem:
-        text: 'Screenplay'
-        ScrollingScreenplay:
-
-    TabbedPanelItem:
         text: 'Cards'
         RstDocument:
             text:
@@ -20,14 +17,20 @@
                 "To be completed."))
 
     TabbedPanelItem:
-        id: what_up
-        text: str(self.size)
+        id: sp_tab_item
+        text: 'Screenplay'
+
         BoxLayout:
-            TextInput:
-                id: help_me
-                text: 'See tab'
             Label:
-                text: str(help_me.text) + str(what_up.size)
+                id: joe
+                size_hint_x: None
+                width: 0
+            ScrollingScreenplay:
+                id: screeny
+            Label:
+                id: schmoe
+                size_hint_x: None
+                width: 0
 
 
 <ScreenplayManager>:
@@ -45,5 +48,12 @@
         ViewManager:
 
 
+<TabbedContent>:
+    canvas.before:
+        Color:
+            rgba: 75,0,130,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
 
         
