@@ -11,7 +11,6 @@
     height: self.minimum_height
     size_hint_x: None
     width: "8.5in"
-    bar_color: [1, 1, 0, 1]
     canvas.before:
         Color:
             rgba: [1, 1, 1, 1]
@@ -23,3 +22,13 @@
             size_hint_y: None
             text_size: self.width, None
         Character:
+
+<ScrollingScreenplay>:
+    bar_width: 20
+    bar_color: [.427, .031, .686, 1]
+    bar_inactive_color: self.bar_color[:3] + [.2]
+    scroll_type: ['bars']
+    # scroll_timeout being 0 prevents touch scrolling and sends touch controls
+    # directly to the children
+    scroll_timeout: 0
+    Screenplay:
