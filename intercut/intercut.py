@@ -1,6 +1,7 @@
+import json
+
 from kivy.core.window import Window
 Window.clearcolor = (.2, .2, .2, 1)
-
 
 from kivy.app import App
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelContent
@@ -9,7 +10,7 @@ from kivy.lang import Builder
 from kivy.metrics import inch
 from kivy.uix.label import Label
 
-from screenplay import Screenplay
+from screenplay import Screenplay, ScrollingScreenplay
 
 Builder.load_file(r'intercut.kv')
 
@@ -35,13 +36,20 @@ class ViewManager(MyTabbedPanel):
                 else:
                     item.width = 0
 
+    def get_screenplay(self):
+        layout = self.default_tab_content
+        for item in layout.children[:]:
+            if isinstance(item, ScrollingScreenplay):
+                return item.children[0]
 
 class ScreenplayManager(MyTabbedPanel):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # We are binding to Window.on_resize instead of using self.bind(size=self.sp_border_width) because the latter
-        # does not catch maximize and minimize events for some reason, even though the content is resized.
+        # We are binding to Window.on_resize instead of using
+        # self.bind(size=self.sp_border_width) because the latter does not
+        #  catch maximize and minimize events for some reason, even though
+        # the content is resized.
         Window.bind(on_resize=self.adjust_sp_widths)
 
     def adjust_sp_widths(self, window, width, height):
@@ -66,13 +74,26 @@ class ScreenplayManager(MyTabbedPanel):
             view_manager = tab.content
             view_manager.sp_border_width(border_w=border_w)
 
+        self.save_screenplay()
+
+    def save_screenplay(self, location=None):
+        screenplay = self.get_screenplay()
+        json_string = screenplay.get_json()
+        # TODO: save json_string to file @ location
+        # TODO: screenplay should have a copy of its save location
+
+    def get_screenplay(self):
+        current_view = self.current_tab.content
+        return current_view.get_screenplay()
+
+
 
 class InterXut(App):
 
     def build(self):
         self.title = "InterXut"
         spm = ScreenplayManager()
-        spm._tab_strip.padding = [40,0,0,0]
+        spm._tab_strip.padding = [40, 0, 0, 0]
         print(spm._tab_strip.padding)
         return spm
 

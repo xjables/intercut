@@ -72,7 +72,6 @@ class Element(ElementBehavior, CoreInput):
             112, modifier='alt', callback=partial(self.morph, new_type=Parenthetical)
         )
 
-
     def morph(self, new_type):
         """Change an element into another element.
         
@@ -209,6 +208,14 @@ class Element(ElementBehavior, CoreInput):
         point the element to the list of previously entered characters.
         """
         pass
+
+    def get_json(self):
+        json_dict = {}
+        json_dict['type'] = self.__class__.__name__
+        json_dict['raw_text'] = self.raw_text
+
+        return json_dict
+
 
 
 class SuggestiveElement(Element):

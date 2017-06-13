@@ -3,7 +3,6 @@
 A Screenplay is just a BoxLayout for carrying the actual Element widgets.
 
 """
-
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.behaviors.compoundselection import CompoundSelectionBehavior
@@ -34,6 +33,11 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
     def __init__(self, **kwargs):
         self.characters = []
         self.locations = []
+        self.title = 'Untitled'
+        self.author = 'Anonymous'
+        self.phone = ''
+        self.email = ''
+        self.version = ''
         super().__init__(**kwargs)
 
     def add_scene(self):
@@ -96,9 +100,22 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
                 self.locations.append(location)
             print(self.locations)
 
-    @classmethod
-    def get_width(cls):
-        return cls.width
+    def get_json(self):
+        json_dict = {}
+        json_dict['title'] = self.title
+        json_dict['locations'] = self.locations
+        json_dict['author'] = self.author
+        json_dict['phone'] = self.phone
+        json_dict['email'] = self.email
+        json_dict['version'] = self.version
+
+        json_dict['scenes'] = []
+
+        for scene in self.children[:]:
+            json_dict['scenes'].append(scene.get_json())
+
+        return json_dict
+
 
 
 class ScrollingScreenplay(ScrollView):

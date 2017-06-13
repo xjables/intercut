@@ -3,7 +3,6 @@
 A Screenplay is just a BoxLayout for carrying the actual Element widgets.
 
 """
-
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.behaviors.compoundselection import CompoundSelectionBehavior
 from kivy.lang import Builder
@@ -36,6 +35,11 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         self._select_to_index = 0
         self._select_to_input = None
         self._select_from_input = None
+
+        self.title = ''
+        self.notes = ''
+        self.color = [1, 1, 1, 1]
+        self.plot_point = ''
 
     def align_scene_indices(self):
         for e_index, element in enumerate(self.children):
@@ -224,3 +228,18 @@ class Scene(CompoundSelectionBehavior, GridLayout):
     def set_focus_by_index(self, element_index):
         element = self.get_element_by_index(element_index=element_index)
         element.focus = True
+
+    def get_json(self):
+        json_dict = {}
+
+        json_dict['title'] = self.title
+        json_dict['notes'] = self.title
+        json_dict['color'] = self.color
+        json_dict['plot_point'] = self.plot_point
+        json_dict['elements'] = []
+
+        for element in self.children:
+            # Should contain raw_text, element_type
+            json_dict['elements'].append(element.get_json())
+
+        return json_dict
