@@ -24,6 +24,8 @@ from kivy.lang import Builder
 from elementbehavior import ElementBehavior
 from coreinput import CoreInput
 
+from collections import OrderedDict
+
 Builder.load_file(r'elements.kv')
 
 
@@ -210,7 +212,8 @@ class Element(ElementBehavior, CoreInput):
         pass
 
     def get_json(self):
-        json_dict = {}
+        json_dict = OrderedDict()
+
         json_dict['type'] = self.__class__.__name__
         json_dict['raw_text'] = self.raw_text
 

@@ -11,6 +11,9 @@ from kivy.lang import Builder
 from scene import Scene
 from elements import Character, SceneHeading
 
+import json
+from collections import OrderedDict
+
 Builder.load_file(r'screenplay.kv')
 
 # TODO: Write a ScreenplayBehavior that captures keyboard shortcuts concerning
@@ -38,6 +41,7 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
         self.phone = ''
         self.email = ''
         self.version = ''
+        self.save_to = ''
         super().__init__(**kwargs)
 
     def add_scene(self):
@@ -101,20 +105,22 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
             print(self.locations)
 
     def get_json(self):
-        json_dict = {}
+        json_dict = OrderedDict()
         json_dict['title'] = self.title
-        json_dict['locations'] = self.locations
         json_dict['author'] = self.author
         json_dict['phone'] = self.phone
         json_dict['email'] = self.email
+        json_dict['locations'] = self.locations
+        json_dict['characters'] = self.characters
         json_dict['version'] = self.version
+        json_dict['save_to'] = self.save_to
 
         json_dict['scenes'] = []
 
         for scene in self.children[:]:
             json_dict['scenes'].append(scene.get_json())
 
-        return json_dict
+        return json.dumps(json_dict, indent=4)
 
 
 

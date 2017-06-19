@@ -9,6 +9,8 @@ from kivy.lang import Builder
 
 from elements import SuggestiveElement, Parenthetical
 
+from collections import OrderedDict
+
 Builder.load_file(r'scene.kv')
 
 
@@ -230,12 +232,13 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         element.focus = True
 
     def get_json(self):
-        json_dict = {}
+        json_dict = OrderedDict()
 
         json_dict['title'] = self.title
-        json_dict['notes'] = self.title
+        json_dict['notes'] = self.notes
         json_dict['color'] = self.color
         json_dict['plot_point'] = self.plot_point
+
         json_dict['elements'] = []
 
         for element in self.children:
