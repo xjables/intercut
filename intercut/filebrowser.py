@@ -23,7 +23,6 @@ class DialogPopup(Popup):
 class SaveDialog(DialogPopup):
 
     default_path = StringProperty('')
-    default_thing = ObjectProperty()
 
     def __init__(self, **kwargs):
         self.register_event_type('on_selection')

@@ -84,16 +84,12 @@ class ScreenplayManager(ElementBehavior, MyTabbedPanel):
         save_to = screenplay.save_to
         save_path = os.path.dirname(save_to)
 
-        if screenplay.save_to and os.path.isfile(save_to):
+        if screenplay.save_to and (os.path.isfile(save_to) or os.path.isdir(save_path)):
             with open(save_to, 'w') as sp_file:
                 sp_file.write(json_string)
         else:
-            if os.path.isdir(save_path):
-                file_dialog = SaveDialog(on_selection=self.update_save_location,
-                                         default_path=save_path)
-            else:
-                file_dialog = SaveDialog(on_selection=self.update_save_location,
-                                         default_path=os.path.expanduser('~'))
+            file_dialog = SaveDialog(on_selection=self.update_save_location,
+                                     default_path=os.path.expanduser('~'))
 
             file_dialog.open()
 

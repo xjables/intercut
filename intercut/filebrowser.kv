@@ -1,17 +1,19 @@
 #: import basename os.path.basename
 
 <SaveDialog>:
-    title: "Save File"
+    title: 'Save File' + ' - ' + filechooser.path
     size_hint: [.7, .7]
     auto_dismiss: False
     BoxLayout:
         orientation: 'vertical'
         FileChooserIconView:
             id: filechooser
+            filters: [view_filter.text]
             path: root.default_path
             on_selection: file_input.text = basename(self.selection[0]) or ''
         GridLayout:
             cols: 2
+            size_hint_y: None
             row_force_default: True
             row_default_height: 30
             TextInput:
@@ -23,6 +25,7 @@
                 size_hint_x: .3
                 on_release: root.save(filechooser.path, file_input.text)
             TextInput:
+                id: view_filter
                 size_hint_x: .7
                 text: '*.ixt'
                 hint_text: '(filters) ex. *.ixt'
