@@ -33,3 +33,37 @@
                 size_hint_x: .3
                 text: "Cancel"
                 on_release: root.cancel()
+
+<LoadDialog>:
+    title: 'Save File' + ' - ' + filechooser.path
+    size_hint: [.7, .7]
+    auto_dismiss: False
+    BoxLayout:
+        orientation: 'vertical'
+        FileChooserIconView:
+            id: filechooser
+            filters: [view_filter.text]
+            path: root.default_path
+            on_selection: file_input.text = basename(self.selection[0]) or ''
+        GridLayout:
+            cols: 2
+            size_hint_y: None
+            row_force_default: True
+            row_default_height: 30
+            TextInput:
+                id: file_input
+                focus: True
+                size_hint_x: .7
+            Button:
+                text: "Load"
+                size_hint_x: .3
+                on_release: root.load(filechooser.path, file_input.text)
+            TextInput:
+                id: view_filter
+                size_hint_x: .7
+                text: '*.ixt'
+                hint_text: '(filters) ex. *.ixt'
+            Button:
+                size_hint_x: .3
+                text: "Cancel"
+                on_release: root.cancel()

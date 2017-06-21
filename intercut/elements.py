@@ -18,8 +18,9 @@ Parenthetical:
 from functools import partial
 
 from suggest import DropSuggestion, SuggestionButton
-from kivy.properties import NumericProperty
+from kivy.properties import NumericProperty, StringProperty
 from kivy.lang import Builder
+from kivy.uix.dropdown import DropDownException
 
 from elementbehavior import ElementBehavior
 from coreinput import CoreInput
@@ -37,13 +38,12 @@ class Element(ElementBehavior, CoreInput):
     # TextInput.text is the displayed text. It will have formatting in it such
     # as capitalizations and wrapping newline characters. This text will remain
     # unformatted in the background.
+    raw_text = StringProperty()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # This will be used to track the elements location in the SP directly.
         self.element_index = 0
-        self.raw_text = ''
-
         # Register Special Keys
         self.register_shortcut(  # enter
             13, callback=self.on_enter)
@@ -175,16 +175,15 @@ class Element(ElementBehavior, CoreInput):
             except IndexError:
                 slice_to = len_txt
             self.raw_text = raw_text[:slice_to] + raw_text[slice_to + cut_len:]
-            print(self.raw_text)
 
     def insert_text(self, substring, from_undo=False):
         """Capitalize scene heading."""
+        print('element.insert_text')
         raw_text = self.raw_text
         slice_to = self.cursor_index()
         self.raw_text = raw_text[:slice_to] + substring + raw_text[
                                                           slice_to:]
-        print(self.raw_text)
-        super().insert_text(substring, from_undo=from_undo)
+        super().insert_text(substring=substring, from_undo=from_undo)
 
     def core_insert(self, substring, from_undo=False):
         super().insert_text(substring=substring, from_undo=from_undo)
@@ -218,7 +217,6 @@ class Element(ElementBehavior, CoreInput):
         json_dict['raw_text'] = self.raw_text
 
         return json_dict
-
 
 
 class SuggestiveElement(Element):
@@ -300,8 +298,11 @@ class SuggestiveElement(Element):
         text = self.text
         if text:
             self.update_options()
-            self.drop_down.open(self)
-            self.drop_down.set_highlight()
+            try:
+                self.drop_down.open(self)
+                self.drop_down.set_highlight()
+            except DropDownException:
+                self.drop_down.dismiss()
         else:
             self.drop_down.dismiss()
 
@@ -428,7 +429,6 @@ class Parenthetical(Element):
 
     def on_backspace(self):
         c_index = self.cursor_index()
-        print(c_index)
         text_len = len(self.text)
         if text_len == 2:
             scene = self.parent
@@ -451,7 +451,6 @@ class Parenthetical(Element):
         slice_to = self.cursor_index() - 1
         self.raw_text = raw_text[:slice_to] + substring + raw_text[
                                                           slice_to:]
-        print(self.raw_text)
         # Skip over Element.insert_text
         super(Element, self).insert_text(substring, from_undo=from_undo)
 

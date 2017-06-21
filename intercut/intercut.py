@@ -2,7 +2,7 @@ from kivy.core.window import Window
 Window.clearcolor = (.2, .2, .2, 1)
 
 from kivy.app import App
-from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelContent
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
 from kivy.uix.floatlayout import FloatLayout
 from kivy.lang import Builder
 from kivy.metrics import inch
@@ -10,9 +10,10 @@ from kivy.uix.label import Label
 from kivy.core.window import Window
 
 import os
+import json
 
 from screenplay import Screenplay, ScrollingScreenplay
-from filebrowser import SaveDialog
+from filebrowser import SaveDialog, LoadDialog
 from elementbehavior import ElementBehavior
 
 Builder.load_file(r'intercut.kv')
@@ -86,6 +87,7 @@ class ScreenplayManager(ElementBehavior, MyTabbedPanel):
 
         if screenplay.save_to and (os.path.isfile(save_to) or os.path.isdir(save_path)):
             with open(save_to, 'w') as sp_file:
+                print('writing:\n', json_string)
                 sp_file.write(json_string)
         else:
             file_dialog = SaveDialog(on_selection=self.update_save_location,
@@ -93,11 +95,16 @@ class ScreenplayManager(ElementBehavior, MyTabbedPanel):
 
             file_dialog.open()
 
-        # TODO: save json_string to file @ location
-        # TODO: screenplay should have a copy of its save location
-
     def update_save_location(self, instance, path, filename):
-        print('update_save_location called via on_selection event')
+        """Update screenplay save location and write to file.
+
+        Note: This is automatically called when SaveDialog is completed.
+
+        Args:
+            instance:
+            path: (str) Path to selected in file dialog.
+            filename: File name selected in file dialog.
+        """
         screenplay = self.get_screenplay()
         screenplay.save_to = os.path.join(path, filename)
         self.save_screenplay()
@@ -106,13 +113,42 @@ class ScreenplayManager(ElementBehavior, MyTabbedPanel):
         current_view = self.current_tab.content
         return current_view.get_screenplay()
 
+    def new_screenplay(self):
+        sp_view = ViewManager()
+        screenplay = sp_view.get_screenplay()
+        tab_header = TabbedPanelHeader(text=screenplay.title)
+        tab_header.content = sp_view
+        self.add_widget(tab_header)
+        self.switch_to(header=tab_header)
+        return screenplay
+
+    def load_from_file(self):
+        file_dialog = LoadDialog(on_selection=self.fill_screenplay,
+                                 default_path=os.path.expanduser('~'))
+        file_dialog.open()
+
+    def fill_screenplay(self, instance, path, filename):
+        screenplay = self.new_screenplay()
+        screenplay.clear_widgets()
+        print('children', screenplay.children[:])
+        open_file = os.path.join(path, filename)
+        with open(open_file, 'r') as stream:
+            json_string = stream.read()
+        json_dict = json.loads(json_string)
+        print('children', screenplay.children[:])
+        screenplay.load_from_json(json_dict=json_dict)
+        print('children', screenplay.children[:])
+
     def on_key_down(self, window, key, scancode, codepoint, modifiers):
         if len(modifiers) == 1:
             if modifiers[0] == 'ctrl':
-                if key == 115:
+                if key == 115:  # 'ctrl' + s
                     self.save_screenplay()
-                elif key == 111:
-                    print('open the damn thing')
+                if key == 110:  # 'ctrl' + n
+                    self.new_screenplay()
+                if key == 111:  # 'ctrl' + o
+                    self.load_from_file()
+
 
 class InterXut(App):
 

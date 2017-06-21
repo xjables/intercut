@@ -13,7 +13,6 @@ FL_IS_NEWLINE = FL_IS_LINEBREAK | FL_IS_WORDBREAK
 class CoreInput(TextInput):
 
     def __init__(self, **kwargs):
-        self.raw_text = stringmanip.RawText()
         self.wrap_length = 30
         super(CoreInput, self).__init__(**kwargs)
 
@@ -107,6 +106,7 @@ class CoreInput(TextInput):
         self.cursor = self.get_cursor_from_index(ci + len_str)
         # handle undo and redo
         self._set_unredo_insert(ci, ci + len_str, substring, from_undo)
+        print(self.text)
 
     def _split_smart(self, text):
         # Do a "smart" split. If autowidth or autosize is set,

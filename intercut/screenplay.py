@@ -116,11 +116,36 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
         json_dict['save_to'] = self.save_to
 
         json_dict['scenes'] = []
+        print('scene.children', self.children[:])
 
         for scene in self.children[:]:
             json_dict['scenes'].append(scene.get_json())
 
+        json_dict['scenes'] = list(reversed(json_dict['scenes']))
+        print(json_dict['scenes'])
+
         return json.dumps(json_dict, indent=4)
+
+    def load_from_json(self, json_dict):
+        self.title = json_dict['title']
+        self.author = json_dict['author']
+        self.phone = json_dict['phone']
+        self.email = json_dict['email']
+        self.locations = json_dict['locations']
+        self.characters = json_dict['characters']
+        self.version = json_dict['version']
+        self.save_to = json_dict['save_to']
+
+        print('load:', self.children[:])
+        print('scenes:', json_dict['scenes'])
+
+        for item in json_dict['scenes']:
+            scene = Scene()
+            scene.clear_widgets()
+            scene.load_from_json(item)
+            self.add_widget(scene)
+
+        self.align_all_indices()
 
 
 

@@ -7,7 +7,8 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.behaviors.compoundselection import CompoundSelectionBehavior
 from kivy.lang import Builder
 
-from elements import SuggestiveElement, Parenthetical
+from elements import SuggestiveElement, Parenthetical, SceneHeading, \
+    Action, Dialogue, Character
 
 from collections import OrderedDict
 
@@ -81,9 +82,6 @@ class Scene(CompoundSelectionBehavior, GridLayout):
             new_element.text = raw_source
 
         new_element.raw_text = raw_source
-
-        print('displayed:', new_element.text)
-        print('raw:', new_element.raw_text)
 
         self.remove_element(source_element)
         new_element.focus = True
@@ -241,8 +239,31 @@ class Scene(CompoundSelectionBehavior, GridLayout):
 
         json_dict['elements'] = []
 
-        for element in self.children:
+        for element in self.children[:]:
             # Should contain raw_text, element_type
             json_dict['elements'].append(element.get_json())
 
+        json_dict['elements'] = list(reversed(json_dict['elements']))
         return json_dict
+
+    def load_from_json(self, json_dict):
+        self.title = json_dict['title']
+        self.notes = json_dict['notes']
+        self.color = json_dict['color']
+        self.plot_point = json_dict['plot_point']
+
+        get_element = {'Action': Action,
+                       'SceneHeading': SceneHeading,
+                       'Parenthetical': Parenthetical,
+                       'Character': Character,
+                       'Dialogue': Dialogue}
+
+        for item in json_dict['elements']:
+            e_type, raw_text = item['type'], item['raw_text']
+            element = get_element[e_type]()
+            element.raw_text = raw_text
+            if isinstance(element, SuggestiveElement):
+                element.text = raw_text.upper()
+            else:
+                element.text = raw_text
+            self.add_widget(element)

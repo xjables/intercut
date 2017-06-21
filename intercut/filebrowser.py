@@ -13,9 +13,6 @@ Builder.load_file(r'filebrowser.kv')
 
 class DialogPopup(Popup):
 
-    def load(self):
-        print('load the damn thing')
-
     def cancel(self):
         self.dismiss()
 
@@ -37,4 +34,16 @@ class SaveDialog(DialogPopup):
 
 
 class LoadDialog(DialogPopup):
-    pass
+
+    default_path = StringProperty('')
+
+    def __init__(self, **kwargs):
+        self.register_event_type('on_selection')
+        super().__init__(**kwargs)
+
+    def load(self, path, filename):
+        self.dispatch('on_selection', path, filename)
+        self.dismiss()
+
+    def on_selection(self, path, filename):
+        pass
