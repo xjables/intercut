@@ -8,6 +8,7 @@ from kivy.lang import Builder
 from kivy.metrics import inch
 from kivy.uix.label import Label
 from kivy.core.window import Window
+from kivy.properties import ObjectProperty
 
 import os
 import json
@@ -32,7 +33,6 @@ class ViewManager(MyTabbedPanel):
             border_w:
                 Width to be applied to each screenplay border.
         """
-
         for item in self.default_tab_content.children[:]:
             if isinstance(item, Label):
                 if border_w > 0:
@@ -49,13 +49,24 @@ class ViewManager(MyTabbedPanel):
 
 class ScreenplayManager(ElementBehavior, MyTabbedPanel):
 
+    previous_tab = ObjectProperty()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # We are binding to Window.on_resize instead of using
         # self.bind(size=self.sp_border_width) because the latter does not
         #  catch maximize and minimize events for some reason, even though
         # the content is resized.
-        Window.bind(on_resize=self.adjust_sp_widths, on_key_down=self.on_key_down)
+        Window.bind(on_resize=self.adjust_sp_widths,
+                    on_key_down=self.on_key_down)
+
+    def switch_to(self, header):
+        """Override of switch_to for tracking previous tab."""
+        if self.previous_tab is header:
+            pass
+        else:
+            self.previous_tab = header
+            super().switch_to(header=header)
 
     def adjust_sp_widths(self, window, width, height):
         """Adjust the Screenplay borders for ALL open screenplays.
@@ -87,7 +98,6 @@ class ScreenplayManager(ElementBehavior, MyTabbedPanel):
 
         if screenplay.save_to and (os.path.isfile(save_to) or os.path.isdir(save_path)):
             with open(save_to, 'w') as sp_file:
-                print('writing:\n', json_string)
                 sp_file.write(json_string)
         else:
             file_dialog = SaveDialog(on_selection=self.update_save_location,
@@ -115,10 +125,12 @@ class ScreenplayManager(ElementBehavior, MyTabbedPanel):
 
     def new_screenplay(self):
         sp_view = ViewManager()
+        print('new_screenplay')
         screenplay = sp_view.get_screenplay()
         tab_header = TabbedPanelHeader(text=screenplay.title)
         tab_header.content = sp_view
         self.add_widget(tab_header)
+        Window.dispatch('on_resize', None, None)
         self.switch_to(header=tab_header)
         return screenplay
 
@@ -130,14 +142,23 @@ class ScreenplayManager(ElementBehavior, MyTabbedPanel):
     def fill_screenplay(self, instance, path, filename):
         screenplay = self.new_screenplay()
         screenplay.clear_widgets()
-        print('children', screenplay.children[:])
         open_file = os.path.join(path, filename)
         with open(open_file, 'r') as stream:
             json_string = stream.read()
         json_dict = json.loads(json_string)
-        print('children', screenplay.children[:])
         screenplay.load_from_json(json_dict=json_dict)
-        print('children', screenplay.children[:])
+
+    def close_current_tab(self):
+        """Remove the current tab and select tab to the right. If not, left."""
+        tab_list = self.tab_list
+        current_tab = self.current_tab
+
+        index = tab_list.index(current_tab)
+        self.remove_widget(current_tab)
+        if index == 0:
+            self.switch_to(tab_list[index])
+        else:
+            self.switch_to(tab_list[index-1])
 
     def on_key_down(self, window, key, scancode, codepoint, modifiers):
         if len(modifiers) == 1:
@@ -148,6 +169,8 @@ class ScreenplayManager(ElementBehavior, MyTabbedPanel):
                     self.new_screenplay()
                 if key == 111:  # 'ctrl' + o
                     self.load_from_file()
+                if key == 119:  # 'ctrl' + w
+                    self.close_current_tab()
 
 
 class InterXut(App):
@@ -156,7 +179,6 @@ class InterXut(App):
         self.title = "InterXut"
         spm = ScreenplayManager()
         spm._tab_strip.padding = [40, 0, 0, 0]
-        print(spm._tab_strip.padding)
         return spm
 
 

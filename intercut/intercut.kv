@@ -19,15 +19,17 @@
     TabbedPanelItem:
         id: sp_tab_item
         text: 'Screenplay'
-
         BoxLayout:
             Label:
-                size_hint_x: None
-                width: 0
+                size_hint: None, None
+                size: (15, 40)
             ScrollingScreenplay:
+                id: screenplay
             Label:
-                size_hint_x: None
-                width: 0
+                size_hint: None, None
+                size: (15, 40)
+
+
 
 
 <ScreenplayManager>:
