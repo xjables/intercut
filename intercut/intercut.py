@@ -47,7 +47,7 @@ class ViewManager(MyTabbedPanel):
                 return item.children[0]
 
 
-class ScreenplayManager(ElementBehavior, MyTabbedPanel):
+class ScreenplayManager(MyTabbedPanel):
 
     previous_tab = ObjectProperty()
 
@@ -125,8 +125,8 @@ class ScreenplayManager(ElementBehavior, MyTabbedPanel):
 
     def new_screenplay(self):
         sp_view = ViewManager()
-        print('new_screenplay')
         screenplay = sp_view.get_screenplay()
+
         tab_header = TabbedPanelHeader(text=screenplay.title)
         tab_header.content = sp_view
         self.add_widget(tab_header)
