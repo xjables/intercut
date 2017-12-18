@@ -48,21 +48,21 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         for e_index, element in enumerate(self.children):
             element.element_index = e_index
 
-    def add_element(self, source_element, added_element):
+    def add_element(self, source_element):
         """Add an element to scene.
 
         Note: added_element is a class, not an instance of the class.
 
         Args:
             source_element: The element requesting that an element be added.
-            added_element: The element object to be inserted.
         """
+        added_element = source_element.next_element()
         # Adding the widget at source_element's location adds it in place
         self.add_widget(added_element, index=source_element.element_index)
 
         # Some element initialization steps cannot occur until the element knows
         # its place in the widget tree. If you need some of these steps,
-        # override Element.integrate
+        # override Element.integrate, otherwise it does nothing
         added_element.integrate()
 
         added_element.focus = True

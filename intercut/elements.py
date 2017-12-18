@@ -97,7 +97,8 @@ class Element(ElementBehavior, CoreInput):
         return scene.scene_index, self.element_index
 
     def on_enter(self):
-        self.next_element()
+        scene = self.parent
+        scene.add_element(self)
 
     def press_down(self):
         c_row = self.cursor[1]
@@ -333,9 +334,7 @@ class Action(Element):
         super().__init__(**kwargs)
 
     def next_element(self):
-        scene = self.parent
-        added_element = SceneHeading()
-        scene.add_element(self, added_element=added_element)
+        return SceneHeading()
 
     def tab_to(self):
         pass
@@ -356,10 +355,9 @@ class SceneHeading(SuggestiveElement):
         location = self.raw_text
         scene = self.parent
         screenplay = scene.parent
-        added_element = Action()
-
         screenplay.update_locations(new_location=location)
-        scene.add_element(self, added_element=added_element)
+
+        return Action()
 
     def tab_to(self):
         pass
@@ -381,10 +379,9 @@ class Character(SuggestiveElement):
         character = self.raw_text
         scene = self.parent
         screenplay = scene.parent
-        added_element = Dialogue()
-
         screenplay.update_characters(new_character=character)
-        scene.add_element(self, added_element=added_element)
+
+        return Dialogue()
 
     def tab_to(self):
         pass
@@ -396,9 +393,7 @@ class Dialogue(Element):
         super().__init__(**kwargs)
 
     def next_element(self):
-        scene = self.parent
-        added_element = Character()
-        scene.add_element(self, added_element=added_element)
+        return Character()
 
     def tab_to(self):
         pass
@@ -442,9 +437,7 @@ class Parenthetical(Element):
             return True
 
     def next_element(self):
-        scene = self.parent
-        added_element = Dialogue()
-        scene.add_element(self, added_element=added_element)
+        return Dialogue()
 
     def insert_text(self, substring, from_undo=False):
         """Capitalize scene heading."""
