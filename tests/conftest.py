@@ -10,7 +10,6 @@ import mock
 
 from kivy.base import EventLoopBase
 
-
 def pytest_runtest_setup(item):
     item.mock_patches = [
         mock.patch('kivy.uix.widget.Builder'),

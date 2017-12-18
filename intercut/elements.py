@@ -16,6 +16,7 @@ Parenthetical:
     This is embedded in dialogue to indicate a non-verbal cue to the actors.
 """
 from functools import partial
+import os.path
 
 from suggest import DropSuggestion, SuggestionButton
 from kivy.properties import NumericProperty, StringProperty
@@ -27,7 +28,8 @@ from coreinput import CoreInput
 
 from collections import OrderedDict
 
-Builder.load_file(r'elements.kv')
+kivy_file = os.path.splitext(os.path.abspath(__file__))[0] + '.kv'
+Builder.load_file(kivy_file)
 
 
 class Element(ElementBehavior, CoreInput):

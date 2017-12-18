@@ -24,9 +24,9 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
 
     """A collection of dialogue, action, and creative writing!
     
-    A Screenplay object is simply a Kivy layout containing element objects.
+    A Screenplay object is simply a Kivy layout containing Scene objects.
     That's it. Take note of the separation of concerns here. Screenplay does
-    not bother itself with the details of each element -- how they look, what
+    not bother itself with the details of each Scene -- how they look, what
     they can do -- but rather handles the aspects of managing their logistics,
     (ie. position, creation)
     
@@ -73,7 +73,7 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
         # self.align_all_indices()
 
     def align_all_indices(self):
-        """Align the indices of the Screenplay.children and the their own
+        """Align the indices of the Screenplay.children (scene objects) and the their own
         element_index property.
 
         This should be called anytime the ordering of the Screenplay elements
