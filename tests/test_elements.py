@@ -9,11 +9,39 @@ import elements
 
 @pytest.fixture
 def empty_action_element():
-    '''Return an empty action element.'''
-    print(type(elements.Action().on_enter()))
+    '''Return an empty Action element.'''
     return elements.Action()
-    
-    
-def test_action_next_element(empty_action_element):
-    assert isinstance(empty_action_element.on_enter(), elements.Action())
 
+
+@pytest.fixture
+def empty_character_element():
+    '''Return and empty Character element.'''
+    return elements.Character()
+
+@pytest.fixture
+def empty_dialogue_element():
+    '''Return an empty Dialogue element.'''
+    return elements.Dialogue()
+
+
+@pytest.fixture
+def empty_parenthetical_element():
+    '''Return an empty Parenthetical element.'''
+    return elements.Parenthetical()
+
+
+@pytest.fixture
+def empty_heading_element():
+    '''Return an empty SceneHeading element.'''
+    return elements.SceneHeading()
+
+
+@pytest.mark.parametrize("current_element,next_elem", [
+    (empty_action_element(), elements.Action),
+    (empty_character_element(), elements.Dialogue),
+    (empty_dialogue_element(), elements.Character),
+    (empty_parenthetical_element(), elements.Dialogue),
+    (empty_heading_element(), elements.Action),
+])
+def test_next_element(current_element, next_elem):
+    assert isinstance(current_element.next_element(), next_elem)

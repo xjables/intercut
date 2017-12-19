@@ -334,7 +334,7 @@ class Action(Element):
         super().__init__(**kwargs)
 
     def next_element(self):
-        return SceneHeading()
+        return Action()
 
     def tab_to(self):
         pass
@@ -349,14 +349,15 @@ class SceneHeading(SuggestiveElement):
         screenplay = self.parent.parent
         self.source = screenplay.locations
 
-    def next_element(self):
-        self.drop_down.dismiss()
-
+    def update_selections(self):
+        '''Update the list of SceneHeadings in use.'''
         location = self.raw_text
         scene = self.parent
         screenplay = scene.parent
         screenplay.update_locations(new_location=location)
 
+    def next_element(self):
+        self.drop_down.dismiss()
         return Action()
 
     def tab_to(self):
@@ -373,14 +374,14 @@ class Character(SuggestiveElement):
         screenplay = self.parent.parent
         self.source = screenplay.characters
 
-    def next_element(self):
-        self.drop_down.dismiss()
-
+    def update_selections(self):
         character = self.raw_text
         scene = self.parent
         screenplay = scene.parent
         screenplay.update_characters(new_character=character)
 
+    def next_element(self):
+        self.drop_down.dismiss()
         return Dialogue()
 
     def tab_to(self):

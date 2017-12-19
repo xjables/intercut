@@ -56,6 +56,9 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         Args:
             source_element: The element requesting that an element be added.
         """
+        if isinstance(source_element, SuggestiveElement):
+            source_element.update_selections()
+
         added_element = source_element.next_element()
         # Adding the widget at source_element's location adds it in place
         self.add_widget(added_element, index=source_element.element_index)
