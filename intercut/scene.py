@@ -6,6 +6,7 @@ A Screenplay is just a BoxLayout for carrying the actual Element widgets.
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.behaviors.compoundselection import CompoundSelectionBehavior
 from kivy.lang import Builder
+from kivy.core.window import Window
 
 from elements import SuggestiveElement, Parenthetical, SceneHeading, \
     Action, Dialogue, Character
@@ -71,8 +72,9 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         added_element.focus = True
         self.parent.parent.scroll_to(added_element)
 
+        return added_element
+
     def transform_element(self, source_element, new_element):
-        self.add_element(source_element, added_element=new_element)
 
         raw_source = source_element.raw_text
 
@@ -85,7 +87,9 @@ class Scene(CompoundSelectionBehavior, GridLayout):
             new_element.text = raw_source
 
         new_element.raw_text = raw_source
+        new_element.element_index = source_element.element_index
 
+        self.add_widget(new_element, index=new_element.element_index)
         self.remove_element(source_element)
         new_element.focus = True
         if isinstance(new_element, Parenthetical):

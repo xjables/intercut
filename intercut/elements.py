@@ -85,7 +85,6 @@ class Element(ElementBehavior, CoreInput):
         scene = self.parent
         new_element = new_type()
         scene.transform_element(source_element=self, new_element=new_element)
-        print(new_element.cursor_index())
 
     def get_location(self):
         """Retrieve the coordinates of this element.
