@@ -97,7 +97,7 @@ class Element(ElementBehavior, CoreInput):
 
     def on_enter(self):
         scene = self.parent
-        scene.add_element(self)
+        scene.next_element(self)
 
     def press_down(self):
         c_row = self.cursor[1]

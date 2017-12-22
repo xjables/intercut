@@ -49,30 +49,31 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         for e_index, element in enumerate(self.children):
             element.element_index = e_index
 
-    def add_element(self, source_element):
+    def add_element(self, element):
         """Add an element to scene.
 
         Note: added_element is a class, not an instance of the class.
 
         Args:
-            source_element: The element requesting that an element be added.
+            element: The element to be added to Scene.
         """
-        if isinstance(source_element, SuggestiveElement):
-            source_element.update_selections()
+        self.add_widget(element, index=element.element_index)
 
-        added_element = source_element.next_element()
-        # Adding the widget at source_element's location adds it in place
-        self.add_widget(added_element, index=source_element.element_index)
+        if isinstance(element, SuggestiveElement):
+            element.update_selections()
 
         # Some element initialization steps cannot occur until the element knows
         # its place in the widget tree. If you need some of these steps,
         # override Element.integrate, otherwise it does nothing
-        added_element.integrate()
+        element.integrate()
 
-        added_element.focus = True
-        self.parent.parent.scroll_to(added_element)
+        element.focus = True
+        self.parent.parent.scroll_to(element)
 
-        return added_element
+    def next_element(self, source_element):
+        new_element = source_element.next_element()
+        new_element.element_index = source_element.element_index
+        self.add_element(new_element)
 
     def transform_element(self, source_element, new_element):
 
@@ -89,14 +90,12 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         new_element.raw_text = raw_source
         new_element.element_index = source_element.element_index
 
-        self.add_widget(new_element, index=new_element.element_index)
         self.remove_element(source_element)
-        new_element.focus = True
+        self.add_element(new_element)
         if isinstance(new_element, Parenthetical):
             new_element.do_cursor_movement('cursor_left')
             # FIXME: The line above doesn't set the initial cursor to the left
             # FIXME: of the far right parenthesis. Not sure why?
-        self.parent.parent.scroll_to(new_element)
 
     def strip_parenthesis(self, string):
         if string.startswith('('):
