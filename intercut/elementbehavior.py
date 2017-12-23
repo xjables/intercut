@@ -27,6 +27,7 @@ class ElementBehavior(object):
             # inside one of the following sub dictionaries
             'ctrl': {},
             'alt': {},
+            'shift': {}
         }
 
         # Register special keys by setting modifier to None in
@@ -98,7 +99,7 @@ class ElementBehavior(object):
         is_special_key = (not modifiers) and (str(key) in self.special_keys)
 
         mod = modifiers[0] if modifiers else None
-        if mod in ('alt', 'ctrl'):
+        if mod in ('alt', 'ctrl', 'shift'):
             is_element_shortcut = str(key) in self.bindings[mod]
         else:
             is_element_shortcut = False

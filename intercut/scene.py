@@ -67,13 +67,12 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         # override Element.integrate, otherwise it does nothing
         element.integrate()
 
-        element.focus = True
-        self.parent.parent.scroll_to(element)
-
     def next_element(self, source_element):
         new_element = source_element.next_element()
         new_element.element_index = source_element.element_index
         self.add_element(new_element)
+        new_element.focus = True
+        self.parent.parent.scroll_to(new_element)
 
     def transform_element(self, source_element, new_element):
 
@@ -96,6 +95,9 @@ class Scene(CompoundSelectionBehavior, GridLayout):
             new_element.do_cursor_movement('cursor_left')
             # FIXME: The line above doesn't set the initial cursor to the left
             # FIXME: of the far right parenthesis. Not sure why?
+        new_element.focus = True
+        self.parent.parent.scroll_to(new_element)
+
 
     def strip_parenthesis(self, string):
         if string.startswith('('):

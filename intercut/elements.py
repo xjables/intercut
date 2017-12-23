@@ -52,7 +52,9 @@ class Element(ElementBehavior, CoreInput):
         self.register_shortcut(  # backspace
             8, callback=self.on_backspace, kill=False)
         self.register_shortcut(  # tab
-             9, callback=self.tab_to)
+            9, callback=self.tab_to)
+        self.register_shortcut(  # tab + shift
+            9, modifier='shift', callback=self.tab_inverse)
         self.register_shortcut(  # down
             274, callback=self.press_down, kill=False)
         self.register_shortcut(  # up
@@ -336,7 +338,10 @@ class Action(Element):
         return Action()
 
     def tab_to(self):
-        pass
+        self.morph(new_type=Character)
+
+    def tab_inverse(self):
+        self.morph(new_type=SceneHeading)
 
 
 class SceneHeading(SuggestiveElement):
@@ -360,6 +365,9 @@ class SceneHeading(SuggestiveElement):
         return Action()
 
     def tab_to(self):
+        self.morph(new_type=Action)
+
+    def tab_inverse(self):
         pass
 
 
@@ -386,6 +394,9 @@ class Character(SuggestiveElement):
     def tab_to(self):
         pass
 
+    def tab_inverse(self):
+        self.morph(new_type=Action)
+
 
 class Dialogue(Element):
 
@@ -396,7 +407,10 @@ class Dialogue(Element):
         return Character()
 
     def tab_to(self):
-        pass
+        self.morph(new_type=Parenthetical)
+
+    def tab_inverse(self):
+        self.morph(new_type=Character)
 
 
 class Parenthetical(Element):
@@ -439,6 +453,12 @@ class Parenthetical(Element):
     def next_element(self):
         return Dialogue()
 
+    def tab_to(self):
+        pass
+
+    def tab_inverse(self):
+        self.morph(new_type=Dialogue)
+
     def insert_text(self, substring, from_undo=False):
         """Capitalize scene heading."""
         raw_text = self.raw_text
@@ -451,9 +471,3 @@ class Parenthetical(Element):
 
     def cut_text_parenthesis(self):
         return self.text[1: -1]
-
-    def tab_to(self):
-        pass
-
-
-
