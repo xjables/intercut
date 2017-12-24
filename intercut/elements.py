@@ -368,7 +368,8 @@ class SceneHeading(SuggestiveElement):
         self.morph(new_type=Action)
 
     def tab_inverse(self):
-        pass
+        scene_i, elem_i = self.get_location()
+        print("<scene, element> = <{scene}, {elem}>".format(scene=scene_i, elem=elem_i))
 
 
 class Character(SuggestiveElement):

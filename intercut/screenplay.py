@@ -79,6 +79,8 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
         This should be called anytime the ordering of the Screenplay elements
         changes.
         """
+        print("align_all_indicies called.")
+        print(list(enumerate(self.children)))
         for s_index, scene in enumerate(self.children):
             scene.scene_index = s_index
             scene.align_scene_indices()

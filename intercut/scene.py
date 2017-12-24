@@ -98,7 +98,6 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         new_element.focus = True
         self.parent.parent.scroll_to(new_element)
 
-
     def strip_parenthesis(self, string):
         if string.startswith('('):
             string = string[1:]
@@ -117,7 +116,7 @@ class Scene(CompoundSelectionBehavior, GridLayout):
                     on_touch_down=self.left_click_down,
                     on_touch_up=self.left_click_up)
         super().add_widget(widget, **kwargs)
-        self.align_scene_indices()
+        self.parent.align_all_indices()
 
     def remove_element(self, element, **kwargs):
         """Helper function for removing elements from the screenplay.
@@ -129,7 +128,7 @@ class Scene(CompoundSelectionBehavior, GridLayout):
             element.drop_down.dismiss()
 
         super().remove_widget(element, **kwargs)
-        self.align_scene_indices()
+        self.parent.align_all_indices()
         f_element = self.get_element_by_index(new_index)
         f_element.focus = True
 
@@ -152,7 +151,10 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         # self.children = self.children[:element.element_index]
 
     def get_element_by_index(self, element_index):
-        return self.children[element_index]
+        try:
+            return self.children[element_index]
+        except IndexError:
+            return self.children[-1]
 
     def left_click_move(self, element, touch):
         """Track final highlighting position across elements.
