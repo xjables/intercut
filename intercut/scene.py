@@ -98,6 +98,13 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         new_element.focus = True
         self.parent.parent.scroll_to(new_element)
 
+    def get_focused_element(self):
+        for element in self.children[:]:
+            if element.focus:
+                return element
+
+        return None
+
     def strip_parenthesis(self, string):
         if string.startswith('('):
             string = string[1:]

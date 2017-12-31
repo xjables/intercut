@@ -85,6 +85,13 @@ class Screenplay(CompoundSelectionBehavior, GridLayout):
             scene.scene_index = s_index
             scene.align_scene_indices()
 
+    def get_focused_scene(self):
+        for scene in self.children[:]:
+            if scene.get_focused_element():
+                return scene
+
+        return None
+
     def update_characters(self, new_character):
         if new_character:
             character = new_character.strip()
