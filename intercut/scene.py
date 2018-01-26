@@ -67,9 +67,13 @@ class Scene(CompoundSelectionBehavior, GridLayout):
         # override Element.integrate, otherwise it does nothing
         element.integrate()
 
-    def next_element(self, source_element):
+    def next_element(self, source_element, raw_text=""):
         new_element = source_element.next_element()
         new_element.element_index = source_element.element_index
+
+        if raw_text:
+            new_element.raw_text = raw_text
+
         self.add_element(new_element)
         new_element.focus = True
         self.parent.parent.scroll_to(new_element)

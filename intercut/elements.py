@@ -106,7 +106,9 @@ class Element(ElementBehavior, CoreInput):
             scene = self.parent
             scene.next_element(self)
         else:
-            pass
+            start = self.cursor_index()
+            end = len(self.raw_text)
+            self.select_text(start, end)
 
     def press_down(self):
         c_row = self.cursor[1]
