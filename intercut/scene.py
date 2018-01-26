@@ -73,6 +73,10 @@ class Scene(CompoundSelectionBehavior, GridLayout):
 
         if raw_text:
             new_element.raw_text = raw_text
+            new_element.text = raw_text
+            # new_element.cursor = (0, 0)
+            # TODO: The line above doesn't set the cursor to the beginning. Hm.
+            # None of the cursor controls seem to work on this
 
         self.add_element(new_element)
         new_element.focus = True

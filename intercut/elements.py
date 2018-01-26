@@ -102,13 +102,18 @@ class Element(ElementBehavior, CoreInput):
         return self.cursor_index() == len(self.raw_text)
 
     def on_enter(self):
+        scene = self.parent
+
         if self.cursor_at_end():
-            scene = self.parent
             scene.next_element(self)
         else:
             start = self.cursor_index()
             end = len(self.raw_text)
             self.select_text(start, end)
+            data = self.raw_text[start: end]
+            self.delete_selection()
+            print('data:', data)
+            scene.next_element(self, raw_text=data)
 
     def press_down(self):
         c_row = self.cursor[1]
