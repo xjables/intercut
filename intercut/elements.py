@@ -97,9 +97,16 @@ class Element(ElementBehavior, CoreInput):
         scene = self.parent
         return scene.scene_index, self.element_index
 
+    def cursor_at_end(self):
+        """Returns true if cursor position is at the end of an element."""
+        return self.cursor_index() == len(self.raw_text)
+
     def on_enter(self):
-        scene = self.parent
-        scene.next_element(self)
+        if self.cursor_at_end():
+            scene = self.parent
+            scene.next_element(self)
+        else:
+            pass
 
     def press_down(self):
         c_row = self.cursor[1]
